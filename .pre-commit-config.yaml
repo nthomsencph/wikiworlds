@@ -31,6 +31,12 @@ repos:
       - id: ruff-format
   - repo: local
     hooks:
+      - id: backend-mypy
+        name: Backend MyPy
+        entry: bash -c 'cd backend && uv run mypy app'
+        language: system
+        files: "^backend/.*\\.py$"
+        pass_filenames: false
       - id: frontend-lint
         name: Frontend ESLint
         entry: bash -c 'cd frontend && npm run lint:fix'

@@ -91,7 +91,7 @@ jobs:
       - test-playwright
       - changes
     # Merge reports after playwright-tests, even if some shards have failed
-    if: ${{ !cancelled() && needs.changes.outputs.changed == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.changed == 'true' && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -107,10 +107,22 @@ jobs:
         path: frontend/all-blob-reports
         pattern: blob-report-*
         merge-multiple: true
+    - name: Check if blob reports exist
+      id: check-reports
+      run: |
+        if [ -d "all-blob-reports" ] && [ "$(ls -A all-blob-reports)" ]; then
+          echo "reports-exist=true" >> $GITHUB_OUTPUT
+        else
+          echo "reports-exist=false" >> $GITHUB_OUTPUT
+          echo "No blob reports found to merge"
+        fi
+      working-directory: frontend
     - name: Merge into HTML Report
+      if: steps.check-reports.outputs.reports-exist == 'true'
       run: npx playwright merge-reports --reporter html ./all-blob-reports
       working-directory: frontend
     - name: Upload HTML report
+      if: steps.check-reports.outputs.reports-exist == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: html-report--attempt-${{ github.run_attempt }}

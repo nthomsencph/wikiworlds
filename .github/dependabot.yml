@@ -14,6 +14,10 @@ updates:
       interval: daily
     commit-message:
       prefix: ⬆
+    ignore:
+      # Ignore Python version bumps that may break compatibility
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major"]
   # npm
   - package-ecosystem: npm
     directory: /frontend
