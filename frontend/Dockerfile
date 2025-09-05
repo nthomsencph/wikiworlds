@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:22-alpine AS build-stage
+FROM node:24-alpine AS build-stage
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ ARG NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # Stage 1, production stage with minimal Node.js runtime
-FROM node:22-alpine AS production-stage
+FROM node:24-alpine AS production-stage
 
 WORKDIR /app
 
