@@ -1,5 +1,5 @@
 import { Button, Center, Flex, Text } from "@chakra-ui/react"
-import { Link } from "@tanstack/react-router"
+import Link from "next/link"
 
 const NotFound = () => {
   return (
@@ -38,7 +38,7 @@ const NotFound = () => {
           The page you are looking for was not found.
         </Text>
         <Center zIndex={1}>
-          <Link to="/">
+          <Link href="/">
             <Button
               variant="solid"
               colorScheme="teal"

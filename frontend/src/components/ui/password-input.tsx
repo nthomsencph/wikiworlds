@@ -90,7 +90,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         </InputGroup>
       </Field>
     )
-  },
+  }
 )
 
 const VisibilityTrigger = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -109,7 +109,7 @@ const VisibilityTrigger = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     )
-  },
+  }
 )
 
 interface PasswordStrengthMeterProps extends StackProps {

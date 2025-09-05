@@ -12,7 +12,7 @@ import {
 import { useState } from "react"
 import { FaPlus } from "react-icons/fa"
 
-import { type ItemCreate, ItemsService } from "@/client"
+import { type ItemCreate, Items as ItemsAPI } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
@@ -47,7 +47,7 @@ const AddItem = () => {
 
   const mutation = useMutation({
     mutationFn: (data: ItemCreate) =>
-      ItemsService.createItem({ requestBody: data }),
+      ItemsAPI.createItem({ requestBody: data }),
     onSuccess: () => {
       showSuccessToast("Item created successfully.")
       reset()

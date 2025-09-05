@@ -3,10 +3,10 @@
 set -e
 set -x
 
-cd backend
-python -c "import app.main; import json; print(json.dumps(app.main.app.openapi()))" > ../openapi.json
-cd ..
-mv openapi.json frontend/
+# Download OpenAPI spec from running backend
+curl -o frontend/openapi.json http://localhost:8000/api/v1/openapi.json
+
 cd frontend
 npm run generate-client
-npx biome format --write ./src/client
+# Note: using prettier instead of biome for Next.js project
+npx prettier --write ./src/client

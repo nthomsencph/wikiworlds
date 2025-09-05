@@ -199,7 +199,7 @@ export const PaginationPageText = React.forwardRef<
     if (format === "compact") return `${page} of ${totalPages}`
     return `${pageRange.start + 1} - ${Math.min(
       pageRange.end,
-      count,
+      count
     )} of ${count}`
   }, [format, page, totalPages, pageRange, count])
 

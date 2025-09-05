@@ -1,16 +1,12 @@
 import { defineConfig } from "@hey-api/openapi-ts"
 
 export default defineConfig({
-  client: "legacy/axios",
   input: "./openapi.json",
   output: "./src/client",
-  // exportSchemas: true,
   plugins: [
     {
       name: "@hey-api/sdk",
-      // NOTE: this doesn't allow tree-shaking
       asClass: true,
-      operationId: true,
       methodNameBuilder: (operation) => {
         // @ts-ignore
         let name: string = operation.name
@@ -23,6 +19,9 @@ export default defineConfig({
 
         return name.charAt(0).toLowerCase() + name.slice(1)
       },
+    },
+    {
+      name: "legacy/axios", // This is how we specify the client in the new version
     },
   ],
 })

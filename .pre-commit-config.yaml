@@ -13,10 +13,15 @@ repos:
         exclude: |
             (?x)^(
                 frontend/src/client/.*|
+                frontend/openapi\.json|
                 backend/app/email-templates/build/.*
             )$
       - id: trailing-whitespace
-        exclude: ^frontend/src/client/.*
+        exclude: |
+            (?x)^(
+                frontend/src/client/.*|
+                frontend/openapi\.json
+            )$
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.2.2
     hooks:
@@ -26,12 +31,18 @@ repos:
       - id: ruff-format
   - repo: local
     hooks:
-      - id: local-biome-check
-        name: biome check
-        entry: npx biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
+      - id: frontend-lint
+        name: Frontend ESLint
+        entry: bash -c 'cd frontend && npm run lint:fix'
         language: system
-        types: [text]
-        files: "\\.(jsx?|tsx?|c(js|ts)|m(js|ts)|d\\.(ts|cts|mts)|jsonc?|css|svelte|vue|astro|graphql|gql)$"
+        files: "^frontend/.*\\.(jsx?|tsx?|ts|js)$"
+        pass_filenames: false
+      - id: frontend-format
+        name: Frontend Prettier
+        entry: bash -c 'cd frontend && npm run format'
+        language: system
+        files: "^frontend/.*\\.(jsx?|tsx?|ts|js|json|css|md)$"
+        pass_filenames: false
 
 ci:
   autofix_commit_msg: 🎨 [pre-commit.ci] Auto format from pre-commit.com hooks

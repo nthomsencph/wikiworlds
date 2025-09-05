@@ -28,7 +28,7 @@ export const passwordRules = (isRequired = true) => {
 
 export const confirmPasswordRules = (
   getValues: () => any,
-  isRequired = true,
+  isRequired = true
 ) => {
   const rules: any = {
     validate: (value: string) => {
@@ -44,12 +44,32 @@ export const confirmPasswordRules = (
   return rules
 }
 
-export const handleError = (err: ApiError) => {
-  const { showErrorToast } = useCustomToast()
+// Helper function to extract error message from API error
+export const getErrorMessage = (err: ApiError): string => {
   const errDetail = (err.body as any)?.detail
   let errorMessage = errDetail || "Something went wrong."
   if (Array.isArray(errDetail) && errDetail.length > 0) {
     errorMessage = errDetail[0].msg
   }
-  showErrorToast(errorMessage)
+  return errorMessage
+}
+
+// Custom hook for handling errors with toast
+export const useErrorHandler = () => {
+  const { showErrorToast } = useCustomToast()
+
+  const handleError = (err: ApiError) => {
+    const errorMessage = getErrorMessage(err)
+    showErrorToast(errorMessage)
+  }
+
+  return { handleError }
+}
+
+// Backwards compatibility - deprecated function
+// @deprecated Use useErrorHandler hook instead
+export const handleError = (err: ApiError) => {
+  console.warn("handleError is deprecated. Use useErrorHandler hook instead.")
+  // For backwards compatibility, just log the error
+  console.error("API Error:", getErrorMessage(err))
 }

@@ -14,7 +14,7 @@ import {
 import { useState } from "react"
 import { FaExchangeAlt } from "react-icons/fa"
 
-import { type UserPublic, type UserUpdate, UsersService } from "@/client"
+import { type UserPublic, type UserUpdate, Users } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { emailPattern, handleError } from "@/utils"
@@ -56,7 +56,7 @@ const EditUser = ({ user }: EditUserProps) => {
 
   const mutation = useMutation({
     mutationFn: (data: UserUpdateForm) =>
-      UsersService.updateUser({ userId: user.id, requestBody: data }),
+      Users.updateUser({ userId: user.id, requestBody: data }),
     onSuccess: () => {
       showSuccessToast("User updated successfully.")
       reset()

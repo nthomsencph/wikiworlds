@@ -11,11 +11,18 @@ export interface ColorModeProviderProps extends ThemeProviderProps {}
 
 export function ColorModeProvider(props: ColorModeProviderProps) {
   return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+    <ThemeProvider
+      attribute="class"
+      disableTransitionOnChange
+      enableColorScheme={false}
+      enableSystem={true}
+      themes={["light", "dark", "system"]}
+      {...props}
+    />
   )
 }
 
-export type ColorMode = "light" | "dark"
+export type ColorMode = "light" | "dark" | "system"
 
 export interface UseColorModeReturn {
   colorMode: ColorMode
@@ -24,25 +31,31 @@ export interface UseColorModeReturn {
 }
 
 export function useColorMode(): UseColorModeReturn {
-  const { resolvedTheme, setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme } = useTheme()
   const toggleColorMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    if (theme === "system") {
+      // If currently system, switch to the opposite of resolved theme
+      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    } else {
+      // Toggle between light and dark
+      setTheme(theme === "dark" ? "light" : "dark")
+    }
   }
   return {
-    colorMode: resolvedTheme as ColorMode,
-    setColorMode: setTheme,
+    colorMode: (theme || "system") as ColorMode,
+    setColorMode: setTheme as (colorMode: ColorMode) => void,
     toggleColorMode,
   }
 }
 
 export function useColorModeValue<T>(light: T, dark: T) {
-  const { colorMode } = useColorMode()
-  return colorMode === "dark" ? dark : light
+  const { resolvedTheme } = useTheme()
+  return resolvedTheme === "dark" ? dark : light
 }
 
 export function ColorModeIcon() {
-  const { colorMode } = useColorMode()
-  return colorMode === "dark" ? <LuMoon /> : <LuSun />
+  const { resolvedTheme } = useTheme()
+  return resolvedTheme === "dark" ? <LuMoon /> : <LuSun />
 }
 
 interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
@@ -87,7 +100,7 @@ export const LightMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         {...props}
       />
     )
-  },
+  }
 )
 
 export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
@@ -103,5 +116,5 @@ export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         {...props}
       />
     )
-  },
+  }
 )

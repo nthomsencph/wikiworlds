@@ -1,37 +1,44 @@
+"use client"
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import {
   type Body_login_login_access_token as AccessToken,
   type ApiError,
-  LoginService,
+  Login,
   type UserPublic,
   type UserRegister,
-  UsersService,
+  Users,
 } from "@/client"
-import { handleError } from "@/utils"
+import { useErrorHandler } from "@/utils"
 
 const isLoggedIn = () => {
+  if (typeof window === "undefined") {
+    return false // Server-side rendering
+  }
   return localStorage.getItem("access_token") !== null
 }
 
 const useAuth = () => {
   const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
+  const router = useRouter()
   const queryClient = useQueryClient()
+  const { handleError } = useErrorHandler()
   const { data: user } = useQuery<UserPublic | null, Error>({
     queryKey: ["currentUser"],
-    queryFn: UsersService.readUserMe,
+    queryFn: Users.readUserMe,
     enabled: isLoggedIn(),
+    retry: 1,
   })
 
   const signUpMutation = useMutation({
     mutationFn: (data: UserRegister) =>
-      UsersService.registerUser({ requestBody: data }),
+      Users.registerUser({ requestBody: data }),
 
     onSuccess: () => {
-      navigate({ to: "/login" })
+      router.push("/login")
     },
     onError: (err: ApiError) => {
       handleError(err)
@@ -42,16 +49,19 @@ const useAuth = () => {
   })
 
   const login = async (data: AccessToken) => {
-    const response = await LoginService.loginAccessToken({
+    const response = await Login.loginAccessToken({
       formData: data,
     })
-    localStorage.setItem("access_token", response.access_token)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("access_token", response.access_token)
+    }
   }
 
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
-      navigate({ to: "/" })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+      router.push("/")
     },
     onError: (err: ApiError) => {
       handleError(err)
@@ -59,8 +69,10 @@ const useAuth = () => {
   })
 
   const logout = () => {
-    localStorage.removeItem("access_token")
-    navigate({ to: "/login" })
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("access_token")
+    }
+    router.push("/login")
   }
 
   return {
