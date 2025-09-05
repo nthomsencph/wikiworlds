@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:20 AS build-stage
+FROM node:22-alpine AS build-stage
 
 WORKDIR /app
 
@@ -13,13 +13,13 @@ RUN npm install
 COPY ./ /app/
 
 # Build arguments for Next.js environment variables
-ARG NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ARG NEXT_PUBLIC_API_URL
 
 # Build the Next.js application
 RUN npm run build
 
 # Stage 1, production stage with minimal Node.js runtime
-FROM node:20-alpine AS production-stage
+FROM node:22-alpine AS production-stage
 
 WORKDIR /app
 

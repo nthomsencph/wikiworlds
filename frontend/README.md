@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend - Next.js Application
+
+This is the frontend for the FastAPI Full Stack Template, built with [Next.js](https://nextjs.org) and the App Router.
+
+## Technology Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Chakra UI v3
+- **State Management**: TanStack Query (React Query)
+- **Forms**: React Hook Form
+- **Theme**: Dark/Light mode with system detection
+- **API Client**: Auto-generated from OpenAPI spec
+- **Testing**: Playwright for E2E tests
+- **Linting**: ESLint + Prettier
 
 ## Getting Started
 
-First, run the development server:
+### Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Build for production
+npm run build
 
-## Learn More
+# Start production server
+npm start
 
-To learn more about Next.js, take a look at the following resources:
+# Lint code
+npm run lint
+npm run lint:fix
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Format code
+npm run format
+npm run format:check
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Type check
+npm run type-check
 
-## Deploy on Vercel
+# Generate API client from backend
+npm run generate-client
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── (protected)/       # Protected routes group
+│   ├── login/             # Login page
+│   ├── signup/            # Signup page
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # UI components (Chakra UI)
+│   ├── Common/           # Shared components
+│   ├── Items/            # Item-related components
+│   └── UserSettings/     # User settings components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+└── client/              # Auto-generated API client
+```
+
+## Features
+
+- **Authentication**: JWT-based auth with protected routes
+- **Dark Mode**: System theme detection + manual toggle
+- **Responsive**: Mobile-first design with Chakra UI
+- **Type Safety**: Full TypeScript integration
+- **API Integration**: Auto-generated client from FastAPI OpenAPI spec
+- **Form Handling**: React Hook Form with validation
+- **Error Handling**: Centralized error management with toasts
+
+## Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+## API Client Generation
+
+The API client is automatically generated from the backend's OpenAPI specification:
+
+```bash
+# Download OpenAPI spec and generate client
+npm run generate-client
+```
+
+This creates TypeScript interfaces and service classes in `src/client/`.
