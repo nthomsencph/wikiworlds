@@ -7,6 +7,7 @@ import { FiPlus } from "react-icons/fi"
 
 import { Items as ItemsAPI } from "@/client"
 import AddItem from "@/components/Items/AddItem"
+import { ItemActionsMenu } from "@/components/Common/ItemActionsMenu"
 import PendingItems from "@/components/Pending/PendingItems"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@chakra-ui/react"
@@ -75,14 +76,19 @@ export default function Items() {
             borderWidth={1}
             borderRadius="md"
             mb={4}
-            _hover={{ bg: "gray.50" }}
+            _hover={{ bg: { base: "gray.50", _dark: "gray.700" } }}
           >
-            <Heading size="sm">{item.title}</Heading>
-            {item.description && (
-              <Text color="gray.600" mt={2}>
-                {item.description}
-              </Text>
-            )}
+            <Flex justify="space-between" align="start">
+              <Box flex={1}>
+                <Heading size="sm">{item.title}</Heading>
+                {item.description && (
+                  <Text color="gray.600" mt={2}>
+                    {item.description}
+                  </Text>
+                )}
+              </Box>
+              <ItemActionsMenu item={item} />
+            </Flex>
           </Box>
         ))}
       </Box>

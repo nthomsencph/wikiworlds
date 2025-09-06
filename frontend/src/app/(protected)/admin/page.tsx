@@ -6,6 +6,7 @@ import { useState } from "react"
 
 import { Users } from "@/client"
 import AddUser from "@/components/Admin/AddUser"
+import { UserActionsMenu } from "@/components/Common/UserActionsMenu"
 import PendingUsers from "@/components/Pending/PendingUsers"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@chakra-ui/react"
@@ -74,10 +75,10 @@ export default function Admin() {
             borderWidth={1}
             borderRadius="md"
             mb={4}
-            _hover={{ bg: "gray.50" }}
+            _hover={{ bg: { base: "gray.50", _dark: "gray.700" } }}
           >
-            <Flex justify="space-between" align="center">
-              <Box>
+            <Flex justify="space-between" align="start">
+              <Box flex={1}>
                 <Heading size="sm">{user.full_name || "No Name"}</Heading>
                 <Text color="gray.600">{user.email}</Text>
                 <Text fontSize="sm" color="gray.500">
@@ -85,6 +86,7 @@ export default function Admin() {
                   {user.is_active ? "Active" : "Inactive"}
                 </Text>
               </Box>
+              <UserActionsMenu user={user} />
             </Flex>
           </Box>
         ))}

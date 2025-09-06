@@ -1,15 +1,11 @@
 import { Box, Flex, Icon, Text } from "@chakra-ui/react"
-import { useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
-import { FiBriefcase, FiHome, FiSettings, FiUsers } from "react-icons/fi"
+import { FiBriefcase, FiHome } from "react-icons/fi"
 import type { IconType } from "react-icons/lib"
-
-import type { UserPublic } from "@/client"
 
 const items = [
   { icon: FiHome, title: "Dashboard", path: "/" },
   { icon: FiBriefcase, title: "Items", path: "/items" },
-  { icon: FiSettings, title: "User Settings", path: "/settings" },
 ]
 
 interface SidebarItemsProps {
@@ -23,12 +19,7 @@ interface Item {
 }
 
 const SidebarItems = ({ onClose }: SidebarItemsProps) => {
-  const queryClient = useQueryClient()
-  const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
-
-  const finalItems: Item[] = currentUser?.is_superuser
-    ? [...items, { icon: FiUsers, title: "Admin", path: "/admin" }]
-    : items
+  const finalItems: Item[] = items
 
   const listItems = finalItems.map(({ icon, title, path }) => (
     <Link key={title} href={path} onClick={onClose}>
@@ -48,14 +39,7 @@ const SidebarItems = ({ onClose }: SidebarItemsProps) => {
     </Link>
   ))
 
-  return (
-    <>
-      <Text fontSize="xs" px={4} py={2} fontWeight="bold">
-        Menu
-      </Text>
-      <Box>{listItems}</Box>
-    </>
-  )
+  return <Box>{listItems}</Box>
 }
 
 export default SidebarItems

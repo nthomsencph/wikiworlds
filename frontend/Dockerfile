@@ -1,4 +1,27 @@
-# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
+# Stage 0, "development-stage", for development with hot reloading
+FROM node:24-alpine AS development-stage
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json /app/
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Build arguments for Next.js environment variables
+ARG NEXT_PUBLIC_API_URL
+
+# Expose port
+EXPOSE 3000
+
+# Set environment to development
+ENV NODE_ENV=development
+
+# Default command for development (can be overridden)
+CMD ["npm", "run", "dev"]
+
+# Stage 1, "build-stage", based on Node.js, to build and compile the frontend
 FROM node:24-alpine AS build-stage
 
 WORKDIR /app
@@ -18,7 +41,7 @@ ARG NEXT_PUBLIC_API_URL
 # Build the Next.js application
 RUN npm run build
 
-# Stage 1, production stage with minimal Node.js runtime
+# Stage 2, production stage with minimal Node.js runtime
 FROM node:24-alpine AS production-stage
 
 WORKDIR /app
