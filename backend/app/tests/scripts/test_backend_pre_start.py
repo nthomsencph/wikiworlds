@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from app.backend_pre_start import init, logger
+from app.scripts.pre_start import init, logger
 
 
 def test_init_successful_connection() -> None:
@@ -16,7 +16,7 @@ def test_init_successful_connection() -> None:
     session_class_mock.return_value.__exit__.return_value = None
 
     with (
-        patch("app.backend_pre_start.Session", session_class_mock),
+        patch("app.scripts.pre_start.Session", session_class_mock),
         patch.object(logger, "info"),
         patch.object(logger, "error"),
         patch.object(logger, "warn"),
