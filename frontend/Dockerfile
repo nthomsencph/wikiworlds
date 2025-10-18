@@ -1,5 +1,5 @@
 # Stage 0, "development-stage", for development with hot reloading
-FROM node:24-alpine AS development-stage
+FROM node:25-alpine AS development-stage
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ ENV NODE_ENV=development
 CMD ["npm", "run", "dev"]
 
 # Stage 1, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:24-alpine AS build-stage
+FROM node:25-alpine AS build-stage
 
 WORKDIR /app
 
@@ -42,7 +42,7 @@ ARG NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # Stage 2, production stage with minimal Node.js runtime
-FROM node:24-alpine AS production-stage
+FROM node:25-alpine AS production-stage
 
 WORKDIR /app
 
