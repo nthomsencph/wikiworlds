@@ -15,10 +15,7 @@ import { useParams } from "next/navigation"
 import { useState } from "react"
 import { FiCalendar, FiEdit, FiClock } from "react-icons/fi"
 
-import {
-  Entries as EntriesAPI,
-  EntryTypes as EntryTypesAPI,
-} from "@/client"
+import { Entries as EntriesAPI, EntryTypes as EntryTypesAPI } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Field } from "@/components/ui/field"
 import Link from "next/link"
@@ -98,7 +95,7 @@ export default function EntryDetail() {
                 Existed: {entry.timeline_start_year ?? "Unknown"} -{" "}
                 {entry.timeline_is_ongoing
                   ? "present"
-                  : entry.timeline_end_year ?? "Unknown"}
+                  : (entry.timeline_end_year ?? "Unknown")}
                 {entry.timeline_is_circa && " (circa)"}
                 {entry.timeline_display_override && (
                   <Text as="span"> • {entry.timeline_display_override}</Text>
@@ -123,13 +120,7 @@ export default function EntryDetail() {
       <Separator my={8} />
 
       {/* Timeline Filter for Field Values */}
-      <Box
-        mb={8}
-        p={4}
-        borderWidth={1}
-        borderRadius="md"
-        bg="transparent"
-      >
+      <Box mb={8} p={4} borderWidth={1} borderRadius="md" bg="transparent">
         <Field label="View field values at specific year">
           <Flex gap={2} align="center">
             <FiCalendar />
@@ -165,7 +156,13 @@ export default function EntryDetail() {
       <Heading size="md" mb={6}>
         Field Values
         {timelineYear && (
-          <Text as="span" fontSize="sm" fontWeight="normal" color="gray.600" ml={2}>
+          <Text
+            as="span"
+            fontSize="sm"
+            fontWeight="normal"
+            color="gray.600"
+            ml={2}
+          >
             (Year {timelineYear})
           </Text>
         )}
@@ -179,9 +176,7 @@ export default function EntryDetail() {
           textAlign="center"
           color="gray.600"
         >
-          <Text>
-            No field definitions for this entry type.
-          </Text>
+          <Text>No field definitions for this entry type.</Text>
           <Text fontSize="sm" mt={2}>
             Add fields to the entry type to start tracking data.
           </Text>
@@ -242,9 +237,7 @@ export default function EntryDetail() {
                   ) : (
                     <Text fontSize="sm" color="gray.500" fontStyle="italic">
                       No value set
-                      {timelineYear &&
-                        field.is_temporal &&
-                        " for this year"}
+                      {timelineYear && field.is_temporal && " for this year"}
                     </Text>
                   )}
                 </Box>
@@ -273,9 +266,7 @@ export default function EntryDetail() {
         <Link
           href={`/weaves/${weaveId}/worlds/${worldId}/entry-types/${entry.entry_type_id}`}
         >
-          <Button variant="ghost">
-            Manage Field Definitions
-          </Button>
+          <Button variant="ghost">Manage Field Definitions</Button>
         </Link>
       </Flex>
     </Container>

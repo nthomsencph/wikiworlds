@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  Box,
-  Flex,
-  Input,
-  Text,
-  Textarea,
-} from "@chakra-ui/react"
+import { Box, Flex, Input, Text, Textarea } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -115,8 +109,8 @@ export default function CreateWorldModal({
           <DialogHeader>
             <DialogTitle>Create New World</DialogTitle>
             <DialogDescription>
-              Create a new world within this weave. A world is a container for entries
-              and has its own timeline and entry types.
+              Create a new world within this weave. A world is a container for
+              entries and has its own timeline and entry types.
             </DialogDescription>
           </DialogHeader>
 
@@ -132,7 +126,10 @@ export default function CreateWorldModal({
                 >
                   <Flex align="center" gap={2}>
                     <FiAlertCircle color="red" />
-                    <Text fontSize="sm" color={{ base: "red.700", _dark: "red.200" }}>
+                    <Text
+                      fontSize="sm"
+                      color={{ base: "red.700", _dark: "red.200" }}
+                    >
                       {error}
                     </Text>
                   </Flex>
@@ -178,7 +175,10 @@ export default function CreateWorldModal({
                 />
               </Field>
 
-              <Field label="Visibility" helperText="Public worlds can be viewed by anyone">
+              <Field
+                label="Visibility"
+                helperText="Public worlds can be viewed by anyone"
+              >
                 <Flex align="center" gap={2}>
                   <input
                     type="checkbox"

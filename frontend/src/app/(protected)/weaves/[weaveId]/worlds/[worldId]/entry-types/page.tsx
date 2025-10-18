@@ -58,8 +58,8 @@ export default function EntryTypesManagement() {
             <EmptyState.Indicator>📋</EmptyState.Indicator>
             <EmptyState.Title>No entry types yet</EmptyState.Title>
             <EmptyState.Description>
-              Create an entry type to define the structure of your entries (e.g.,
-              Character, Location, Item).
+              Create an entry type to define the structure of your entries
+              (e.g., Character, Location, Item).
             </EmptyState.Description>
           </EmptyState.Content>
           <Button>
@@ -141,9 +141,7 @@ function EntryTypeCard({
       <Separator my={4} />
 
       <Flex justify="space-between" align="center" mb={3}>
-        <Heading size="sm">
-          Fields ({fields.length})
-        </Heading>
+        <Heading size="sm">Fields ({fields.length})</Heading>
         <Button size="sm" variant="ghost" disabled={type.is_system}>
           <FiPlus />
           Add Field
@@ -151,12 +149,7 @@ function EntryTypeCard({
       </Flex>
 
       {fields.length === 0 ? (
-        <Box
-          p={4}
-          borderRadius="md"
-          bg="transparent"
-          textAlign="center"
-        >
+        <Box p={4} borderRadius="md" bg="transparent" textAlign="center">
           <Text fontSize="sm" color="gray.600">
             No fields defined. Add fields to capture data for this entry type.
           </Text>
@@ -164,13 +157,7 @@ function EntryTypeCard({
       ) : (
         <Box>
           {fields.map((field, index) => (
-            <Box
-              key={field.id}
-              p={3}
-              borderRadius="md"
-              mb={2}
-              bg="transparent"
-            >
+            <Box key={field.id} p={3} borderRadius="md" mb={2} bg="transparent">
               <Flex justify="space-between" align="start">
                 <Box flex={1}>
                   <Flex align="center" gap={2} mb={1}>

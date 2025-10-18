@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from "react"
 import { Box, Input, Text } from "@chakra-ui/react"
@@ -52,7 +52,6 @@ export default function CreateEntryTypeModal({
     }
   }, [initialParentId])
 
-
   const createMutation = useMutation({
     mutationFn: (data: any) =>
       EntryTypesAPI.createEntryType({
@@ -68,7 +67,9 @@ export default function CreateEntryTypeModal({
       })
 
       // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: ["entryTypes", weaveId, worldId] })
+      queryClient.invalidateQueries({
+        queryKey: ["entryTypes", weaveId, worldId],
+      })
 
       // Reset form and close
       handleClose()
@@ -76,7 +77,8 @@ export default function CreateEntryTypeModal({
     onError: (error: any) => {
       toaster.create({
         title: "Failed to create entry type",
-        description: error.message || "An error occurred while creating the entry type.",
+        description:
+          error.message || "An error occurred while creating the entry type.",
         type: "error",
       })
     },
@@ -122,7 +124,7 @@ export default function CreateEntryTypeModal({
 
     // Traverse up the hierarchy
     while (currentId) {
-      const entryType = entryTypes.find(type => type.id === currentId)
+      const entryType = entryTypes.find((type) => type.id === currentId)
       if (!entryType) break
       path.unshift(entryType.name)
       currentId = entryType.parent_id || null
@@ -136,7 +138,9 @@ export default function CreateEntryTypeModal({
   return (
     <DialogRoot
       open={isOpen}
-      onOpenChange={(e) => !createMutation.isPending && !e.open && handleClose()}
+      onOpenChange={(e) =>
+        !createMutation.isPending && !e.open && handleClose()
+      }
       size="md"
     >
       <DialogContent
@@ -146,7 +150,6 @@ export default function CreateEntryTypeModal({
         backdropFilter="blur(30px)"
         borderRadius="3xl"
       >
-
         <DialogBody>
           <Box pt={2} pb={0}>
             {/* Path Display */}

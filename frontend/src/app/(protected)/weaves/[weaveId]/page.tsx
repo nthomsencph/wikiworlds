@@ -1,11 +1,27 @@
 "use client"
 
-import { Box, Container, Flex, Heading, Text, Input, Textarea, Grid, Image } from "@chakra-ui/react"
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Text,
+  Input,
+  Textarea,
+  Grid,
+  Image,
+} from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
-import { FiPlus, FiGlobe, FiSettings, FiEdit2, FiChevronDown } from "react-icons/fi"
+import {
+  FiPlus,
+  FiGlobe,
+  FiSettings,
+  FiEdit2,
+  FiChevronDown,
+} from "react-icons/fi"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Weaves as WeavesAPI, Worlds as WorldsAPI } from "@/client"
@@ -68,7 +84,7 @@ export default function WeaveDetail() {
       {/* Fixed background layer */}
       <Box position="fixed" top={0} left={0} right={0} bottom={0} zIndex={0}>
         <LiquidEther
-          colors={['#5227FF', '#FF9FFC', '#B19EEF']}
+          colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
           mouseForce={20}
           cursorSize={100}
           isViscous={false}
@@ -78,7 +94,7 @@ export default function WeaveDetail() {
           takeoverDuration={0.25}
           autoResumeDelay={3000}
           autoRampDuration={0.2}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: "100%", height: "100%" }}
         />
       </Box>
 
@@ -89,13 +105,13 @@ export default function WeaveDetail() {
         height="100vh"
         overflowY="scroll"
         css={{
-          scrollSnapType: 'y mandatory',
-          scrollSnapStop: 'always',
-          '&::-webkit-scrollbar': {
-            display: 'none'
+          scrollSnapType: "y mandatory",
+          scrollSnapStop: "always",
+          "&::-webkit-scrollbar": {
+            display: "none",
           },
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch'
+          scrollbarWidth: "none",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {/* Section 1: Hero - Weave Name & Description */}
@@ -108,8 +124,8 @@ export default function WeaveDetail() {
           px={8}
           position="relative"
           css={{
-            scrollSnapAlign: 'start',
-            scrollSnapStop: 'always'
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
           }}
         >
           <Container maxW="container.md" textAlign="center">
@@ -118,11 +134,7 @@ export default function WeaveDetail() {
                 {weave.icon}
               </Text>
             )}
-            <Heading
-              size="4xl"
-              mb={6}
-              fontWeight="bold"
-            >
+            <Heading size="4xl" mb={6} fontWeight="bold">
               {weave.name}
             </Heading>
             {weave.description && (
@@ -133,8 +145,14 @@ export default function WeaveDetail() {
 
             {/* Scroll indicator */}
             <Flex direction="column" align="center" mt={16} gap={2}>
-              <Text fontSize="sm" color="gray.300">Scroll to explore</Text>
-              <FiChevronDown size={24} color="gray" style={{ animation: 'bounce 2s infinite' }} />
+              <Text fontSize="sm" color="gray.300">
+                Scroll to explore
+              </Text>
+              <FiChevronDown
+                size={24}
+                color="gray"
+                style={{ animation: "bounce 2s infinite" }}
+              />
             </Flex>
           </Container>
         </Flex>
@@ -145,14 +163,19 @@ export default function WeaveDetail() {
           maxH="100vh"
           position="relative"
           css={{
-            scrollSnapAlign: 'start',
-            scrollSnapStop: 'always'
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
           }}
           display="flex"
           flexDirection="column"
           py={12}
         >
-          <Container maxW="container.xl" flex="1" display="flex" flexDirection="column">
+          <Container
+            maxW="container.xl"
+            flex="1"
+            display="flex"
+            flexDirection="column"
+          >
             <Flex justify="space-between" align="center" mb={8}>
               <Box>
                 <Heading size="xl" mb={2}>
@@ -169,7 +192,11 @@ export default function WeaveDetail() {
                 flex="1"
                 textAlign="center"
               >
-                <FiGlobe size={64} color="gray" style={{ marginBottom: '24px' }} />
+                <FiGlobe
+                  size={64}
+                  color="gray"
+                  style={{ marginBottom: "24px" }}
+                />
                 <Heading size="lg" mb={2}>
                   No worlds yet
                 </Heading>
@@ -191,7 +218,7 @@ export default function WeaveDetail() {
                     base: "repeat(1, 1fr)",
                     md: "repeat(2, 1fr)",
                     lg: "repeat(3, 1fr)",
-                    xl: "repeat(4, 1fr)"
+                    xl: "repeat(4, 1fr)",
                   }}
                   gap={6}
                   flex="1"
@@ -201,7 +228,7 @@ export default function WeaveDetail() {
                     <Link
                       key={world.id}
                       href={`/weaves/${weaveId}/worlds/${world.id}`}
-                      style={{ textDecoration: 'none' }}
+                      style={{ textDecoration: "none" }}
                     >
                       <Box
                         bg="rgba(54, 54, 54, 0.5)"
@@ -213,23 +240,22 @@ export default function WeaveDetail() {
                         position="relative"
                         className="world-card"
                         css={{
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            background: 'rgba(70, 70, 70, 0.6)'
+                          "&:hover": {
+                            transform: "translateY(-4px)",
+                            background: "rgba(70, 70, 70, 0.6)",
                           },
-                          '&:hover img': {
-                            filter: 'grayscale(0%) brightness(1)',
-                            opacity: 1
-                          }
+                          "&:hover img": {
+                            filter: "grayscale(0%) brightness(1)",
+                            opacity: 1,
+                          },
                         }}
                       >
-                        <Box
-                          position="relative"
-                          h="100%"
-                          overflow="hidden"
-                        >
+                        <Box position="relative" h="100%" overflow="hidden">
                           <Image
-                            src={world.cover_image || "/assets/images/default-world.png"}
+                            src={
+                              world.cover_image ||
+                              "/assets/images/default-world.png"
+                            }
                             alt={world.name}
                             objectFit="cover"
                             w="100%"
@@ -255,7 +281,12 @@ export default function WeaveDetail() {
                               </Heading>
                             </Flex>
                             {world.description && (
-                              <Text color="gray.300" fontSize="sm" mt={1} lineClamp={2}>
+                              <Text
+                                color="gray.300"
+                                fontSize="sm"
+                                mt={1}
+                                lineClamp={2}
+                              >
                                 {world.description}
                               </Text>
                             )}
@@ -298,8 +329,8 @@ export default function WeaveDetail() {
           maxH="100vh"
           position="relative"
           css={{
-            scrollSnapAlign: 'start',
-            scrollSnapStop: 'always'
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
           }}
           py={12}
           overflowY="auto"
@@ -308,8 +339,10 @@ export default function WeaveDetail() {
             <Flex gap={8} align="start">
               {/* Left: Category selector */}
               <Flex direction="column" gap={6} flexShrink={0}>
-                <Heading size="xl" color="white">Configuration</Heading>
-                <div style={{ background: 'transparent' }}>
+                <Heading size="xl" color="white">
+                  Configuration
+                </Heading>
+                <div style={{ background: "transparent" }}>
                   <AnimatedList
                     items={settingsCategories}
                     onItemSelect={(item) => setSelectedCategory(item)}
@@ -405,7 +438,12 @@ export default function WeaveDetail() {
                               </Field>
                             </Box>
 
-                            <Button colorPalette="red" variant="outline" size="sm" onClick={() => setIsDeleteWeaveModalOpen(true)}>
+                            <Button
+                              colorPalette="red"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setIsDeleteWeaveModalOpen(true)}
+                            >
                               Delete Weave
                             </Button>
                           </>
@@ -431,21 +469,21 @@ export default function WeaveDetail() {
                             </Flex>
 
                             <Box mb={4}>
-
                               <Flex direction="column" gap={3}>
                                 {worlds.map((world) => {
                                   const updatedDate = new Date(world.updated_at)
-                                  const formattedDate = updatedDate.toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                  })
+                                  const formattedDate =
+                                    updatedDate.toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })
 
                                   return (
                                     <Link
                                       key={world.id}
                                       href={`/weaves/${weaveId}/worlds/${world.id}`}
-                                      style={{ textDecoration: 'none' }}
+                                      style={{ textDecoration: "none" }}
                                     >
                                       <Box
                                         p={4}
@@ -456,21 +494,34 @@ export default function WeaveDetail() {
                                         transition="all 0.2s"
                                         _hover={{
                                           bg: "rgba(70, 70, 70, 0.6)",
-                                          transform: "translateY(-2px)"
+                                          transform: "translateY(-2px)",
                                         }}
                                       >
-                                        <Flex justify="space-between" align="center">
+                                        <Flex
+                                          justify="space-between"
+                                          align="center"
+                                        >
                                           <Box flex={1}>
                                             <Flex align="center" gap={2} mb={1}>
                                               {world.icon && (
-                                                <Text fontSize="lg">{world.icon}</Text>
+                                                <Text fontSize="lg">
+                                                  {world.icon}
+                                                </Text>
                                               )}
-                                              <Text color="white" fontWeight="medium" fontSize="md">
+                                              <Text
+                                                color="white"
+                                                fontWeight="medium"
+                                                fontSize="md"
+                                              >
                                                 {world.name}
                                               </Text>
                                             </Flex>
                                             {world.description && (
-                                              <Text color="gray.400" fontSize="sm" lineClamp={1}>
+                                              <Text
+                                                color="gray.400"
+                                                fontSize="sm"
+                                                lineClamp={1}
+                                              >
                                                 {world.description}
                                               </Text>
                                             )}
@@ -558,7 +609,8 @@ export default function WeaveDetail() {
       {/* Add bounce animation */}
       <style jsx global>{`
         @keyframes bounce {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {

@@ -4,19 +4,24 @@ import {
   Box,
   Container,
   Flex,
-  Grid,
   Heading,
-  Input,
   Text,
   Badge,
   TreeView,
   createTreeCollection,
-  useTreeViewContext,
 } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { useParams, useRouter } from "next/navigation"
-import { useState, useMemo, useEffect } from "react"
-import { FiPlus, FiCalendar, FiFilter, FiHome, FiSearch, FiShare2, FiFile } from "react-icons/fi"
+import { useState, useMemo } from "react"
+import {
+  FiPlus,
+  FiCalendar,
+  FiFilter,
+  FiHome,
+  FiSearch,
+  FiShare2,
+  FiFile,
+} from "react-icons/fi"
 import { LuNetwork, LuFolder, LuFile as LuFileIcon } from "react-icons/lu"
 
 import {
@@ -41,8 +46,12 @@ export default function WorldDetail() {
   const [page, setPage] = useState(1)
   const [timelineYear, setTimelineYear] = useState<number | null>(null)
   const [entryTypeFilter, setEntryTypeFilter] = useState<string | null>(null)
-  const [currentView, setCurrentView] = useState<'dashboard' | 'tree' | 'timeline' | 'search' | 'knowledge-graph'>('dashboard')
-  const [treeViewMode, setTreeViewMode] = useState<'hierarchy' | 'entry-type'>('hierarchy')
+  const [currentView, setCurrentView] = useState<
+    "dashboard" | "tree" | "timeline" | "search" | "knowledge-graph"
+  >("dashboard")
+  const [treeViewMode, setTreeViewMode] = useState<"hierarchy" | "entry-type">(
+    "hierarchy"
+  )
 
   const { data: world, isLoading: worldLoading } = useQuery({
     queryFn: () => WorldsAPI.getWorld({ weaveId, worldId }),
@@ -64,7 +73,12 @@ export default function WorldDetail() {
         timelineYear: timelineYear ?? undefined,
         entryTypeId: entryTypeFilter ?? undefined,
       }),
-    queryKey: ["entries", weaveId, worldId, { page, timelineYear, entryTypeFilter }],
+    queryKey: [
+      "entries",
+      weaveId,
+      worldId,
+      { page, timelineYear, entryTypeFilter },
+    ],
   })
 
   // Fetch all entries for tree view (without pagination)
@@ -77,7 +91,7 @@ export default function WorldDetail() {
         limit: 10000, // Large limit to get all entries
       }),
     queryKey: ["allEntries", weaveId, worldId],
-    enabled: currentView === 'tree', // Only fetch when tree view is active
+    enabled: currentView === "tree", // Only fetch when tree view is active
   })
 
   const entryTypes = entryTypesData?.data ?? []
@@ -122,59 +136,143 @@ export default function WorldDetail() {
       })
     }
 
-    if (treeViewMode === 'entry-type') {
-      // Build hierarchical tree based on entry types
-      const entryTypes = entryTypesData?.data || [];
+    if (treeViewMode === "entry-type") {
+      // Build hierarchical tree based on entry types using iterative approach
+      const entryTypes = entryTypesData?.data || []
 
       // Group entries by entry type ID
-      const entriesByType = new Map<string, typeof allEntries>();
-      allEntries.forEach(entry => {
-        const typeId = entry.entry_type_id;
+      const entriesByType = new Map<string, typeof allEntries>()
+      allEntries.forEach((entry) => {
+        const typeId = entry.entry_type_id
         if (!entriesByType.has(typeId)) {
-          entriesByType.set(typeId, []);
+          entriesByType.set(typeId, [])
         }
-        entriesByType.get(typeId)!.push(entry);
-      });
+        entriesByType.get(typeId)!.push(entry)
+      })
 
-      // Build entry type tree recursively
-      const buildEntryTypeTree = (parentId: string | null = null): TreeNode[] => {
-        return entryTypes
-          .filter(type => type.parent_id === parentId)
-          .map(type => {
-            const entries = entriesByType.get(type.id) || [];
-            const childTypes = buildEntryTypeTree(type.id);
+      // Create a map of entry type nodes
+      const typeNodesMap = new Map<string, TreeNode>()
 
-            // Only include this node if it has entries OR has child types
-            if (entries.length === 0 && childTypes.length === 0) {
-              return null;
+      // Create nodes for all entry types that have entries
+      entryTypes.forEach((type) => {
+        const entries = entriesByType.get(type.id) || []
+
+        // Convert entries to tree nodes
+        const entryNodes: TreeNode[] = entries
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .map((entry) => ({
+            id: entry.id,
+            name: entry.title,
+            icon: entry.icon,
+            entryTypeName: null,
+            children: undefined,
+            isEntryTypeFolder: false,
+          }))
+
+        // Create the type node (even if it has no entries yet, it might have children)
+        typeNodesMap.set(type.id, {
+          id: `type-${type.id}`,
+          name: type.name,
+          icon: null,
+          entryTypeName: null,
+          children: entryNodes,
+          childrenCount: entryNodes.length,
+          isEntryTypeFolder: true,
+          _parentId: type.parent_id, // Temporary field for building hierarchy
+        } as TreeNode & { _parentId: string | null })
+      })
+
+      // Build parent-child relationships iteratively
+      const rootNodes: TreeNode[] = []
+
+      // First pass: Build parent-child relationships
+      typeNodesMap.forEach((node, typeId) => {
+        const typedNode = node as TreeNode & { _parentId: string | null }
+        const parentId = typedNode._parentId
+
+        // Check for circular reference
+        if (parentId && parentId === typeId) {
+          console.warn(
+            `Self-reference detected in entry type: ${node.name} (${typeId})`
+          )
+          return
+        }
+
+        if (parentId !== null) {
+          // Child type - add to parent's children
+          const parentNode = typeNodesMap.get(parentId) as
+            | (TreeNode & { _parentId: string | null })
+            | undefined
+          if (parentNode) {
+            if (!parentNode.children) {
+              parentNode.children = []
             }
+            parentNode.children.unshift(typedNode) // Add child types before entries
+          } else {
+            // Parent not found, will be handled as potential root
+            console.warn(
+              `Parent entry type not found for: ${node.name} (parent_id: ${parentId})`
+            )
+          }
+        }
+      })
 
-            // Convert entries to tree nodes
-            const entryNodes: TreeNode[] = entries
-              .sort((a, b) => a.title.localeCompare(b.title))
-              .map(entry => ({
-                id: entry.id,
-                name: entry.title,
-                icon: entry.icon,
-                entryTypeName: null, // Don't show type name since we're already grouped by type
-                children: undefined,
-                isEntryTypeFolder: false,
-              }));
+      // Helper function to recursively filter out empty entry type nodes
+      const filterEmptyEntryTypes = (node: TreeNode): TreeNode | null => {
+        if (!node.children || node.children.length === 0) {
+          // Node has no children at all
+          return null
+        }
 
-            return {
-              id: `type-${type.id}`,
-              name: type.name,
-              icon: null,
-              entryTypeName: null,
-              childrenCount: entries.length + childTypes.length,
-              children: [...childTypes, ...entryNodes].filter(Boolean) as TreeNode[],
-              isEntryTypeFolder: true,
-            };
-          })
-          .filter(Boolean) as TreeNode[];
-      };
+        // Process all children recursively
+        const filteredChildren: TreeNode[] = []
 
-      const rootNodes = buildEntryTypeTree(null);
+        for (const child of node.children) {
+          if (child.isEntryTypeFolder) {
+            // This is an entry type folder - recursively filter it
+            const filteredChild = filterEmptyEntryTypes(child)
+            if (filteredChild) {
+              filteredChildren.push(filteredChild)
+            }
+          } else {
+            // This is an actual entry - keep it
+            filteredChildren.push(child)
+          }
+        }
+
+        // If no children remain after filtering, return null
+        if (filteredChildren.length === 0) {
+          return null
+        }
+
+        // Return the node with filtered children
+        return {
+          ...node,
+          children: filteredChildren,
+          childrenCount: filteredChildren.length,
+        }
+      }
+
+      // Second pass: Build root nodes and filter out empty entry types
+      typeNodesMap.forEach((node, typeId) => {
+        const typedNode = node as TreeNode & { _parentId: string | null }
+        const parentId = typedNode._parentId
+
+        // Only process root-level types or types whose parent wasn't found
+        if (parentId === null || !typeNodesMap.has(parentId)) {
+          // Filter this node and its descendants
+          const filteredNode = filterEmptyEntryTypes(typedNode)
+          if (filteredNode) {
+            delete (filteredNode as any)._parentId
+            rootNodes.push(filteredNode)
+          }
+        }
+      })
+
+      // Clean up any remaining _parentId fields
+      typeNodesMap.forEach((node) => {
+        delete (node as any)._parentId
+      })
 
       return createTreeCollection<TreeNode>({
         nodeToValue: (node) => node.id,
@@ -184,19 +282,19 @@ export default function WorldDetail() {
           name: "",
           children: rootNodes,
         },
-      });
+      })
     }
 
     // Default: hierarchical view by parent-child relationships
     // Build a map of entries by id
-    const entryMap = new Map(allEntries.map(entry => [entry.id, entry]))
+    const entryMap = new Map(allEntries.map((entry) => [entry.id, entry]))
 
     // Build tree structure
     const buildTree = (parentId: string | null = null): TreeNode[] => {
       return allEntries
-        .filter(entry => entry.parent_id === parentId)
+        .filter((entry) => entry.parent_id === parentId)
         .sort((a, b) => a.position - b.position)
-        .map(entry => ({
+        .map((entry) => ({
           id: entry.id,
           name: entry.title,
           icon: entry.icon,
@@ -220,47 +318,38 @@ export default function WorldDetail() {
     })
   }, [allEntries, treeViewMode, entryTypesData])
 
-  // Component to auto-expand all nodes
-  const AutoExpandTree = () => {
-    const tree = useTreeViewContext()
-
-    useEffect(() => {
-      // Expand all nodes when tree loads or when tree view mode changes
-      tree.expand()
-    }, [tree, treeViewMode])
-
-    return null
-  }
+  // Note: Auto-expand removed to prevent infinite render loops
+  // Users can manually expand/collapse nodes as needed
 
   const dockItems: DockItemData[] = [
     {
       icon: <FiHome size={20} />,
-      label: 'Dashboard',
-      onClick: () => setCurrentView('dashboard'),
+      label: "Dashboard",
+      onClick: () => setCurrentView("dashboard"),
     },
     {
       icon: <FiShare2 size={20} />,
-      label: 'Tree',
-      onClick: () => setCurrentView('tree'),
+      label: "Tree",
+      onClick: () => setCurrentView("tree"),
     },
     {
       icon: <FiCalendar size={20} />,
-      label: 'Timeline',
-      onClick: () => setCurrentView('timeline'),
+      label: "Timeline",
+      onClick: () => setCurrentView("timeline"),
     },
     {
       icon: <FiSearch size={20} />,
-      label: 'Search',
-      onClick: () => setCurrentView('search'),
+      label: "Search",
+      onClick: () => setCurrentView("search"),
     },
     {
       icon: <LuNetwork size={20} />,
-      label: 'Knowledge Graph',
-      onClick: () => setCurrentView('knowledge-graph'),
+      label: "Knowledge Graph",
+      onClick: () => setCurrentView("knowledge-graph"),
     },
     {
       icon: <FiPlus size={20} />,
-      label: 'Create',
+      label: "Create",
       onClick: () => {
         router.push(`/weaves/${weaveId}/worlds/${worldId}/entries/create`)
       },
@@ -289,7 +378,11 @@ export default function WorldDetail() {
         {/* World Header */}
         <Box mx="auto" maxW="90%">
           <Flex align="start" gap={4} mb={8}>
-            {world.icon && <Text fontSize="5xl" lineHeight={1}>{world.icon}</Text>}
+            {world.icon && (
+              <Text fontSize="5xl" lineHeight={1}>
+                {world.icon}
+              </Text>
+            )}
             <Box flex={1}>
               <Heading size="2xl" mb={2} color="white">
                 {world.name}
@@ -304,17 +397,15 @@ export default function WorldDetail() {
         </Box>
 
         {/* Dashboard View */}
-        {currentView === 'dashboard' && (
+        {currentView === "dashboard" && (
           <Box mx="auto" maxW="90%">
             {entriesLoading ? (
               <Text color="gray.300">Loading entries...</Text>
             ) : entries.length === 0 ? (
-              <Box
-                textAlign="center"
-                py={16}
-                borderRadius="3xl"
-              >
-                <Text fontSize="4xl" mb={4}>📝</Text>
+              <Box textAlign="center" py={16} borderRadius="3xl">
+                <Text fontSize="4xl" mb={4}>
+                  📝
+                </Text>
                 <Heading size="md" mb={2} color="white">
                   No entries found
                 </Heading>
@@ -331,13 +422,15 @@ export default function WorldDetail() {
         )}
 
         {/* Tree View */}
-        {currentView === 'tree' && (
+        {currentView === "tree" && (
           <Box mx="auto" maxW="90%">
             {allEntriesLoading ? (
               <Text color="gray.300">Loading entries...</Text>
             ) : allEntries.length === 0 ? (
               <Box textAlign="center" py={16}>
-                <Text fontSize="4xl" mb={4}>📝</Text>
+                <Text fontSize="4xl" mb={4}>
+                  📝
+                </Text>
                 <Heading size="md" mb={2} color="white">
                   No entries found
                 </Heading>
@@ -351,33 +444,34 @@ export default function WorldDetail() {
                 <Flex gap={2} mb={4} justify="start">
                   <Button
                     size="sm"
-                    variant={treeViewMode === 'hierarchy' ? 'solid' : 'ghost'}
-                    colorPalette={treeViewMode === 'hierarchy' ? 'teal' : 'gray'}
-                    onClick={() => setTreeViewMode('hierarchy')}
+                    variant={treeViewMode === "hierarchy" ? "solid" : "ghost"}
+                    colorPalette={
+                      treeViewMode === "hierarchy" ? "teal" : "gray"
+                    }
+                    onClick={() => setTreeViewMode("hierarchy")}
                   >
                     Hierarchy
                   </Button>
                   <Button
                     size="sm"
-                    variant={treeViewMode === 'entry-type' ? 'solid' : 'ghost'}
-                    colorPalette={treeViewMode === 'entry-type' ? 'teal' : 'gray'}
-                    onClick={() => setTreeViewMode('entry-type')}
+                    variant={treeViewMode === "entry-type" ? "solid" : "ghost"}
+                    colorPalette={
+                      treeViewMode === "entry-type" ? "teal" : "gray"
+                    }
+                    onClick={() => setTreeViewMode("entry-type")}
                   >
                     By Entry Type
                   </Button>
                 </Flex>
 
-                <TreeView.Root
-                  collection={treeCollection}
-                  size="md"
-                >
-                  <AutoExpandTree />
+                <TreeView.Root collection={treeCollection} size="md">
                   <TreeView.Tree>
                     <TreeView.Node<TreeNode>
                       indentGuide={<TreeView.BranchIndentGuide />}
                       render={({ node, nodeState }) => {
                         // In entry-type mode, folder nodes are entry types (not clickable entries)
-                        const isEntryTypeFolder = node.isEntryTypeFolder === true;
+                        const isEntryTypeFolder =
+                          node.isEntryTypeFolder === true
 
                         return nodeState.isBranch ? (
                           isEntryTypeFolder ? (
@@ -388,7 +482,10 @@ export default function WorldDetail() {
                               borderRadius="md"
                             >
                               <LuFolder color="rgb(20, 184, 166)" />
-                              <TreeView.BranchText color="rgb(94, 234, 212)" fontWeight="medium">
+                              <TreeView.BranchText
+                                color="rgb(94, 234, 212)"
+                                fontWeight="medium"
+                              >
                                 {node.name}
                               </TreeView.BranchText>
                               <TreeView.BranchIndicator color="rgb(94, 234, 212)" />
@@ -396,7 +493,10 @@ export default function WorldDetail() {
                           ) : (
                             <Link
                               href={`/weaves/${weaveId}/worlds/${worldId}/entries/${node.id}`}
-                              style={{ textDecoration: 'none', display: 'block' }}
+                              style={{
+                                textDecoration: "none",
+                                display: "block",
+                              }}
                             >
                               <TreeView.BranchControl
                                 _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
@@ -427,7 +527,7 @@ export default function WorldDetail() {
                         ) : (
                           <Link
                             href={`/weaves/${weaveId}/worlds/${worldId}/entries/${node.id}`}
-                            style={{ textDecoration: 'none', display: 'block' }}
+                            style={{ textDecoration: "none", display: "block" }}
                           >
                             <TreeView.Item
                               _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
@@ -464,25 +564,31 @@ export default function WorldDetail() {
         )}
 
         {/* Timeline View */}
-        {currentView === 'timeline' && (
+        {currentView === "timeline" && (
           <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">Timeline</Heading>
+            <Heading size="lg" mb={4} color="white">
+              Timeline
+            </Heading>
             <Text color="gray.300">Coming soon...</Text>
           </Box>
         )}
 
         {/* Search View */}
-        {currentView === 'search' && (
+        {currentView === "search" && (
           <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">Search</Heading>
+            <Heading size="lg" mb={4} color="white">
+              Search
+            </Heading>
             <Text color="gray.300">Coming soon...</Text>
           </Box>
         )}
 
         {/* Knowledge Graph View */}
-        {currentView === 'knowledge-graph' && (
+        {currentView === "knowledge-graph" && (
           <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">Knowledge Graph</Heading>
+            <Heading size="lg" mb={4} color="white">
+              Knowledge Graph
+            </Heading>
             <Text color="gray.300">Coming soon...</Text>
           </Box>
         )}

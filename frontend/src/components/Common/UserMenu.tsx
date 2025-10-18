@@ -29,7 +29,7 @@ const UserMenu = () => {
           </MenuTrigger>
 
           <MenuContent borderRadius="2xl" overflow="hidden">
-            <Link href="/settings" style={{ textDecoration: 'none' }}>
+            <Link href="/settings" style={{ textDecoration: "none" }}>
               <MenuItem
                 closeOnSelect
                 value="user-settings"

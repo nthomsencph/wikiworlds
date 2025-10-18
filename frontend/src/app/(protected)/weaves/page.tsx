@@ -48,11 +48,7 @@ export default function Weaves() {
           </Box>
         </Container>
 
-        <CreateWeaveModal
-          isOpen={true}
-          onClose={() => {}}
-          isRequired={true}
-        />
+        <CreateWeaveModal isOpen={true} onClose={() => {}} isRequired={true} />
       </>
     )
   }

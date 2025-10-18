@@ -1,13 +1,6 @@
 "use client"
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Input,
-  Text,
-  Textarea,
-} from "@chakra-ui/react"
+import { Box, Flex, Heading, Input, Text, Textarea } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -46,7 +39,8 @@ export default function CreateWeaveModal({
   const [error, setError] = useState<string | null>(null)
 
   const createMutation = useMutation({
-    mutationFn: (data: WeaveCreate) => WeavesAPI.createWeave({ requestBody: data }),
+    mutationFn: (data: WeaveCreate) =>
+      WeavesAPI.createWeave({ requestBody: data }),
     onSuccess: (newWeave) => {
       queryClient.invalidateQueries({ queryKey: ["weaves"] })
       // Reset form
@@ -135,7 +129,10 @@ export default function CreateWeaveModal({
                 >
                   <Flex align="center" gap={2}>
                     <FiAlertCircle color="red" />
-                    <Text fontSize="sm" color={{ base: "red.700", _dark: "red.200" }}>
+                    <Text
+                      fontSize="sm"
+                      color={{ base: "red.700", _dark: "red.200" }}
+                    >
                       {error}
                     </Text>
                   </Flex>
@@ -189,7 +186,10 @@ export default function CreateWeaveModal({
                   borderWidth={1}
                   borderColor={{ base: "blue.200", _dark: "blue.700" }}
                 >
-                  <Text fontSize="sm" color={{ base: "blue.700", _dark: "blue.200" }}>
+                  <Text
+                    fontSize="sm"
+                    color={{ base: "blue.700", _dark: "blue.200" }}
+                  >
                     You need to create at least one weave to use WikiWorlds.
                   </Text>
                 </Box>

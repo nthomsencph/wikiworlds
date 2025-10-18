@@ -22,7 +22,10 @@ interface WeaveNavbarProps {
   worldName?: string
 }
 
-export default function WeaveNavbar({ weaveName, worldName }: WeaveNavbarProps) {
+export default function WeaveNavbar({
+  weaveName,
+  worldName,
+}: WeaveNavbarProps) {
   const { user } = useAuth()
   const pathname = usePathname()
 
@@ -35,7 +38,7 @@ export default function WeaveNavbar({ weaveName, worldName }: WeaveNavbarProps) 
       top={0}
       zIndex={100}
       css={{
-        WebkitBackdropFilter: "blur(20px)"
+        WebkitBackdropFilter: "blur(20px)",
       }}
     >
       <Container maxW="container.xl">

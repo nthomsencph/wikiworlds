@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import {
   Box,
@@ -91,7 +91,9 @@ export default function EntryTypeSelector({
   const [query, setQuery] = useState("")
   const [expanded, setExpanded] = useState<string[]>([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [preselectedParentId, setPreselectedParentId] = useState<string | null>(null)
+  const [preselectedParentId, setPreselectedParentId] = useState<string | null>(
+    null
+  )
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const { contains } = useFilter({ sensitivity: "base" })
@@ -101,8 +103,8 @@ export default function EntryTypeSelector({
     // Build hierarchical structure from flat list
     const buildTree = (parentId: string | null = null): TreeNode[] => {
       return entryTypes
-        .filter(type => type.parent_id === parentId)
-        .map(type => {
+        .filter((type) => type.parent_id === parentId)
+        .map((type) => {
           const children = buildTree(type.id)
           return {
             id: type.id,
@@ -136,7 +138,10 @@ export default function EntryTypeSelector({
   // Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false)
         setQuery("")
         setCollection(initialCollection)
@@ -157,7 +162,7 @@ export default function EntryTypeSelector({
     }
 
     const nextCollection = initialCollection.filter((node) =>
-      contains(node.name, searchQuery),
+      contains(node.name, searchQuery)
     )
 
     setCollection(nextCollection)
@@ -203,7 +208,7 @@ export default function EntryTypeSelector({
 
   // Check if we should render as tree or flat list
   const hasHierarchy = useMemo(() => {
-    return entryTypes.some(type => type.parent_id !== null)
+    return entryTypes.some((type) => type.parent_id !== null)
   }, [entryTypes])
 
   return (
@@ -225,9 +230,7 @@ export default function EntryTypeSelector({
         minW="150px"
         justify="space-between"
       >
-        <Text>
-          {selectedEntryType ? selectedEntryType.name : placeholder}
-        </Text>
+        <Text>{selectedEntryType ? selectedEntryType.name : placeholder}</Text>
         <Flex align="center" gap={1}>
           {selectedEntryType && onClear && (
             <ChakraButton
@@ -291,7 +294,9 @@ export default function EntryTypeSelector({
               <TreeView.Root
                 collection={collection}
                 expandedValue={expanded}
-                onExpandedChange={(details) => setExpanded(details.expandedValue)}
+                onExpandedChange={(details) =>
+                  setExpanded(details.expandedValue)
+                }
                 size="sm"
               >
                 <TreeView.Tree>
@@ -310,8 +315,15 @@ export default function EntryTypeSelector({
                             position="relative"
                             onClick={(e) => {
                               // Only select if not clicking the expand trigger
-                              if (!(e.target as HTMLElement).closest('[data-part="branch-trigger"]')) {
-                                handleSelectWithoutClosing({ id: node.id, name: node.name })
+                              if (
+                                !(e.target as HTMLElement).closest(
+                                  '[data-part="branch-trigger"]'
+                                )
+                              ) {
+                                handleSelectWithoutClosing({
+                                  id: node.id,
+                                  name: node.name,
+                                })
                               }
                             }}
                             cursor="pointer"
@@ -344,7 +356,12 @@ export default function EntryTypeSelector({
                           _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
                           transition="background 0.2s"
                           position="relative"
-                          onClick={() => handleSelectWithoutClosing({ id: node.id, name: node.name })}
+                          onClick={() =>
+                            handleSelectWithoutClosing({
+                              id: node.id,
+                              name: node.name,
+                            })
+                          }
                           cursor="pointer"
                         >
                           <LuFolder color="white" size={16} />
@@ -380,7 +397,9 @@ export default function EntryTypeSelector({
                     borderRadius="md"
                     _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
                     transition="background 0.2s"
-                    onClick={() => handleSelect({ id: type.id, name: type.name })}
+                    onClick={() =>
+                      handleSelect({ id: type.id, name: type.name })
+                    }
                   >
                     <LuFolder color="white" size={16} />
                     <Text color="white" fontSize="sm">

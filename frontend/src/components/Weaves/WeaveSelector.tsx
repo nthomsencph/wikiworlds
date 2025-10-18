@@ -62,7 +62,12 @@ export default function WeaveSelector() {
 
         <MenuContent minW="250px">
           <Box px={3} py={2} borderBottomWidth={1}>
-            <Text fontSize="xs" fontWeight="medium" color="gray.500" textTransform="uppercase">
+            <Text
+              fontSize="xs"
+              fontWeight="medium"
+              color="gray.500"
+              textTransform="uppercase"
+            >
               Your Weaves
             </Text>
           </Box>
@@ -84,7 +89,11 @@ export default function WeaveSelector() {
                   <Text fontSize="sm" fontWeight="medium" lineClamp={1}>
                     {weave.name}
                   </Text>
-                  <Text fontSize="xs" color="gray.500" textTransform="capitalize">
+                  <Text
+                    fontSize="xs"
+                    color="gray.500"
+                    textTransform="capitalize"
+                  >
                     {weave.user_role}
                   </Text>
                 </Box>
