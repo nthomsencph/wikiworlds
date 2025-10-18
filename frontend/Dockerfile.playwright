@@ -1,0 +1,26 @@
+# Dockerfile for Playwright tests with Next.js
+FROM mcr.microsoft.com/playwright:v1.49.1-noble
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build arguments
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Build the application
+RUN npm run build
+
+# Expose port for Playwright HTML reports
+EXPOSE 9323
+
+# Default command to run Playwright tests
+CMD ["npx", "playwright", "test"]

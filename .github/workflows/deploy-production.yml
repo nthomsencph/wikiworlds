@@ -1,0 +1,54 @@
+name: Deploy to Production
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-exist: ${{ steps.check.outputs.secrets-exist }}
+    steps:
+      - name: Check if deployment secrets exist
+        id: check
+        env:
+          DOMAIN_PRODUCTION: ${{ secrets.DOMAIN_PRODUCTION }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          if [[ -n "$DOMAIN_PRODUCTION" && -n "$SECRET_KEY" && -n "$POSTGRES_PASSWORD" ]]; then
+            echo "secrets-exist=true" >> $GITHUB_OUTPUT
+            echo "✅ Essential deployment secrets are configured"
+          else
+            echo "secrets-exist=false" >> $GITHUB_OUTPUT
+            echo "❌ Missing essential deployment secrets (DOMAIN_PRODUCTION, SECRET_KEY, POSTGRES_PASSWORD)"
+            echo "Skipping deployment - configure secrets to enable deployment"
+          fi
+
+  deploy:
+    needs: check-secrets
+    # Do not deploy in the main repository, only in user projects, and only if secrets exist
+    if: github.repository_owner != 'fastapi' && needs.check-secrets.outputs.secrets-exist == 'true'
+    runs-on:
+      - self-hosted
+      - production
+    env:
+      ENVIRONMENT: production
+      DOMAIN: ${{ secrets.DOMAIN_PRODUCTION }}
+      STACK_NAME: ${{ secrets.STACK_NAME_PRODUCTION }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      FIRST_SUPERUSER: ${{ secrets.FIRST_SUPERUSER }}
+      FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_PRODUCTION }} build
+      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_PRODUCTION }} up -d
