@@ -3,7 +3,863 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { BlocksCreateBlockData, BlocksCreateBlockResponse, BlocksListBlocksData, BlocksListBlocksResponse, BlocksBulkCreateBlocksData, BlocksBulkCreateBlocksResponse, BlocksGetBlockData, BlocksGetBlockResponse, BlocksUpdateBlockData, BlocksUpdateBlockResponse, BlocksDeleteBlockData, BlocksDeleteBlockResponse, EntriesCreateEntryData, EntriesCreateEntryResponse, EntriesListEntriesData, EntriesListEntriesResponse, EntriesListRootEntriesData, EntriesListRootEntriesResponse, EntriesGetEntryData, EntriesGetEntryResponse, EntriesUpdateEntryData, EntriesUpdateEntryResponse, EntriesDeleteEntryData, EntriesDeleteEntryResponse, EntriesMoveEntryData, EntriesMoveEntryResponse, EntriesGetChildrenData, EntriesGetChildrenResponse, EntriesGetAncestorsData, EntriesGetAncestorsResponse, EntriesGetFieldValuesData, EntriesGetFieldValuesResponse, EntriesSetFieldValueData, EntriesSetFieldValueResponse, EntriesSetFieldValuesBulkData, EntriesSetFieldValuesBulkResponse, EntriesGetFieldValueHistoryData, EntriesGetFieldValueHistoryResponse, EntriesDeleteFieldValueData, EntriesDeleteFieldValueResponse, EntryTypesCreateEntryTypeData, EntryTypesCreateEntryTypeResponse, EntryTypesListEntryTypesData, EntryTypesListEntryTypesResponse, EntryTypesGetEntryTypeData, EntryTypesGetEntryTypeResponse, EntryTypesUpdateEntryTypeData, EntryTypesUpdateEntryTypeResponse, EntryTypesDeleteEntryTypeData, EntryTypesDeleteEntryTypeResponse, EntryTypesListFieldsData, EntryTypesListFieldsResponse, EntryTypesCreateFieldData, EntryTypesCreateFieldResponse, EntryTypesUpdateFieldData, EntryTypesUpdateFieldResponse, EntryTypesDeleteFieldData, EntryTypesDeleteFieldResponse, EntryTypesReorderFieldsData, EntryTypesReorderFieldsResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, WeavesCreateWeaveData, WeavesCreateWeaveResponse, WeavesListMyWeavesData, WeavesListMyWeavesResponse, WeavesGetWeaveData, WeavesGetWeaveResponse, WeavesUpdateWeaveData, WeavesUpdateWeaveResponse, WeavesDeleteWeaveData, WeavesDeleteWeaveResponse, WeavesListWeaveMembersData, WeavesListWeaveMembersResponse, WeavesAddWeaveMemberData, WeavesAddWeaveMemberResponse, WeavesUpdateMemberRoleData, WeavesUpdateMemberRoleResponse, WeavesRemoveWeaveMemberData, WeavesRemoveWeaveMemberResponse, WorldsCreateWorldData, WorldsCreateWorldResponse, WorldsListWeaveWorldsData, WorldsListWeaveWorldsResponse, WorldsListPublicWorldsData, WorldsListPublicWorldsResponse, WorldsGetWorldData, WorldsGetWorldResponse, WorldsUpdateWorldData, WorldsUpdateWorldResponse, WorldsDeleteWorldData, WorldsDeleteWorldResponse, WorldsListWorldMembersData, WorldsListWorldMembersResponse, WorldsAddWorldMemberData, WorldsAddWorldMemberResponse, WorldsUpdateMemberRoleData, WorldsUpdateMemberRoleResponse, WorldsRemoveWorldMemberData, WorldsRemoveWorldMemberResponse } from './types.gen';
+
+export class Blocks {
+    /**
+     * Create Block
+     * Create a new block for an entry.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.entryId Entry ID to create block for
+     * @param data.requestBody
+     * @returns BlockPublic Successful Response
+     * @throws ApiError
+     */
+    public static createBlock(data: BlocksCreateBlockData): CancelablePromise<BlocksCreateBlockResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                entry_id: data.entryId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Blocks
+     * Get all blocks for an entry.
+     *
+     * Query parameters:
+     * - entry_id: The entry to get blocks for
+     * - timeline_year: Optional year to filter blocks by temporal validity
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.entryId Entry ID to list blocks for
+     * @param data.timelineYear Filter by timeline year
+     * @returns BlocksPublic Successful Response
+     * @throws ApiError
+     */
+    public static listBlocks(data: BlocksListBlocksData): CancelablePromise<BlocksListBlocksResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                entry_id: data.entryId,
+                timeline_year: data.timelineYear
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Bulk Create Blocks
+     * Create multiple blocks at once for an entry.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.entryId Entry ID to create blocks for
+     * @param data.requestBody
+     * @returns BlocksPublic Successful Response
+     * @throws ApiError
+     */
+    public static bulkCreateBlocks(data: BlocksBulkCreateBlocksData): CancelablePromise<BlocksBulkCreateBlocksResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/bulk',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                entry_id: data.entryId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Block
+     * Get a specific block by ID.
+     * @param data The data for the request.
+     * @param data.blockId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns BlockPublic Successful Response
+     * @throws ApiError
+     */
+    public static getBlock(data: BlocksGetBlockData): CancelablePromise<BlocksGetBlockResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/{block_id}',
+            path: {
+                block_id: data.blockId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Block
+     * Update a block.
+     * @param data The data for the request.
+     * @param data.blockId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns BlockPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateBlock(data: BlocksUpdateBlockData): CancelablePromise<BlocksUpdateBlockResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/{block_id}',
+            path: {
+                block_id: data.blockId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Block
+     * Delete a block.
+     * @param data The data for the request.
+     * @param data.blockId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns void Successful Response
+     * @throws ApiError
+     */
+    public static deleteBlock(data: BlocksDeleteBlockData): CancelablePromise<BlocksDeleteBlockResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/blocks/{block_id}',
+            path: {
+                block_id: data.blockId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class Entries {
+    /**
+     * Create Entry
+     * Create a new Entry in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns EntryPublic Successful Response
+     * @throws ApiError
+     */
+    public static createEntry(data: EntriesCreateEntryData): CancelablePromise<EntriesCreateEntryResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Entries
+     * Get all Entries in a World with optional filtering.
+     *
+     * Query parameters:
+     * - entry_type_id: Filter by entry type
+     * - timeline_year: Show only entries that existed in this year
+     * - skip: Pagination offset
+     * - limit: Pagination limit
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.entryTypeId
+     * @param data.timelineYear Filter by timeline year
+     * @param data.skip
+     * @param data.limit
+     * @returns EntriesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listEntries(data: EntriesListEntriesData): CancelablePromise<EntriesListEntriesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                entry_type_id: data.entryTypeId,
+                timeline_year: data.timelineYear,
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Root Entries
+     * Get all root entries (no parent) in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.entryTypeId
+     * @returns EntriesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listRootEntries(data: EntriesListRootEntriesData): CancelablePromise<EntriesListRootEntriesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/roots',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                entry_type_id: data.entryTypeId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Entry
+     * Get a specific Entry by ID with its field values.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.timelineYear Get field values at this year
+     * @returns EntryWithFields Successful Response
+     * @throws ApiError
+     */
+    public static getEntry(data: EntriesGetEntryData): CancelablePromise<EntriesGetEntryResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                timeline_year: data.timelineYear
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Entry
+     * Update an Entry.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns EntryPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateEntry(data: EntriesUpdateEntryData): CancelablePromise<EntriesUpdateEntryResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Entry
+     * Delete an Entry (soft delete).
+     *
+     * By default, only deletes the entry itself. Use recursive=true to delete all descendants.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.recursive Also delete all descendants
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteEntry(data: EntriesDeleteEntryData): CancelablePromise<EntriesDeleteEntryResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                recursive: data.recursive
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Move Entry
+     * Move an entry to a new parent or to root.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns EntryPublic Successful Response
+     * @throws ApiError
+     */
+    public static moveEntry(data: EntriesMoveEntryData): CancelablePromise<EntriesMoveEntryResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/move',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Children
+     * Get child entries of a parent.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.recursive Get all descendants, not just direct children
+     * @returns EntriesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getChildren(data: EntriesGetChildrenData): CancelablePromise<EntriesGetChildrenResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/children',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                recursive: data.recursive
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Ancestors
+     * Get ancestor entries (breadcrumb trail from root to parent).
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns EntriesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getAncestors(data: EntriesGetAncestorsData): CancelablePromise<EntriesGetAncestorsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/ancestors',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Field Values
+     * Get all field values for an entry.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.timelineYear Get values at this year
+     * @returns FieldValuesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getFieldValues(data: EntriesGetFieldValuesData): CancelablePromise<EntriesGetFieldValuesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/fields',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                timeline_year: data.timelineYear
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Set Field Value
+     * Set a field value for an entry.
+     *
+     * For temporal fields, this creates a new value for the specified time period.
+     * For non-temporal fields, this updates the existing value.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns FieldValuePublic Successful Response
+     * @throws ApiError
+     */
+    public static setFieldValue(data: EntriesSetFieldValueData): CancelablePromise<EntriesSetFieldValueResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/fields',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Set Field Values Bulk
+     * Set multiple field values at once.
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns FieldValuesPublic Successful Response
+     * @throws ApiError
+     */
+    public static setFieldValuesBulk(data: EntriesSetFieldValuesBulkData): CancelablePromise<EntriesSetFieldValuesBulkResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/fields/bulk',
+            path: {
+                entry_id: data.entryId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Field Value History
+     * Get all historical values for a specific field (temporal history).
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.fieldDefinitionId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns FieldValuesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getFieldValueHistory(data: EntriesGetFieldValueHistoryData): CancelablePromise<EntriesGetFieldValueHistoryResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/fields/{field_definition_id}/history',
+            path: {
+                entry_id: data.entryId,
+                field_definition_id: data.fieldDefinitionId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Field Value
+     * Delete a specific field value (useful for temporal field values).
+     * @param data The data for the request.
+     * @param data.entryId
+     * @param data.fieldValueId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteFieldValue(data: EntriesDeleteFieldValueData): CancelablePromise<EntriesDeleteFieldValueResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/{entry_id}/fields/{field_value_id}',
+            path: {
+                entry_id: data.entryId,
+                field_value_id: data.fieldValueId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class EntryTypes {
+    /**
+     * Create Entry Type
+     * Create a new EntryType in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns EntryTypePublic Successful Response
+     * @throws ApiError
+     */
+    public static createEntryType(data: EntryTypesCreateEntryTypeData): CancelablePromise<EntryTypesCreateEntryTypeResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Entry Types
+     * Get all EntryTypes in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.skip
+     * @param data.limit
+     * @returns EntryTypesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listEntryTypes(data: EntryTypesListEntryTypesData): CancelablePromise<EntryTypesListEntryTypesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Entry Type
+     * Get a specific EntryType by ID.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns EntryTypePublic Successful Response
+     * @throws ApiError
+     */
+    public static getEntryType(data: EntryTypesGetEntryTypeData): CancelablePromise<EntryTypesGetEntryTypeResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Entry Type
+     * Update an EntryType.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns EntryTypePublic Successful Response
+     * @throws ApiError
+     */
+    public static updateEntryType(data: EntryTypesUpdateEntryTypeData): CancelablePromise<EntryTypesUpdateEntryTypeResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Entry Type
+     * Delete an EntryType (soft delete).
+     *
+     * This will not delete entries of this type, but will prevent new entries from being created.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteEntryType(data: EntryTypesDeleteEntryTypeData): CancelablePromise<EntryTypesDeleteEntryTypeResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Fields
+     * Get all field definitions for an EntryType.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns FieldDefinitionsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listFields(data: EntryTypesListFieldsData): CancelablePromise<EntryTypesListFieldsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}/fields',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Create Field
+     * Create a new field definition for an EntryType.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns FieldDefinitionPublic Successful Response
+     * @throws ApiError
+     */
+    public static createField(data: EntryTypesCreateFieldData): CancelablePromise<EntryTypesCreateFieldResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}/fields',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Field
+     * Update a field definition.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.fieldId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns FieldDefinitionPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateField(data: EntryTypesUpdateFieldData): CancelablePromise<EntryTypesUpdateFieldResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}/fields/{field_id}',
+            path: {
+                entry_type_id: data.entryTypeId,
+                field_id: data.fieldId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Field
+     * Delete a field definition.
+     *
+     * Warning: This will also delete all field values for this field across all entries.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.fieldId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteField(data: EntryTypesDeleteFieldData): CancelablePromise<EntryTypesDeleteFieldResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}/fields/{field_id}',
+            path: {
+                entry_type_id: data.entryTypeId,
+                field_id: data.fieldId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Reorder Fields
+     * Reorder field definitions.
+     * @param data The data for the request.
+     * @param data.entryTypeId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns FieldDefinitionsPublic Successful Response
+     * @throws ApiError
+     */
+    public static reorderFields(data: EntryTypesReorderFieldsData): CancelablePromise<EntryTypesReorderFieldsResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/entry-types/{entry_type_id}/fields/reorder',
+            path: {
+                entry_type_id: data.entryTypeId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class Items {
     /**
@@ -28,7 +884,7 @@ export class Items {
             }
         });
     }
-    
+
     /**
      * Create Item
      * Create new item.
@@ -48,7 +904,7 @@ export class Items {
             }
         });
     }
-    
+
     /**
      * Read Item
      * Get item by ID.
@@ -69,7 +925,7 @@ export class Items {
             }
         });
     }
-    
+
     /**
      * Update Item
      * Update an item.
@@ -93,7 +949,7 @@ export class Items {
             }
         });
     }
-    
+
     /**
      * Delete Item
      * Delete an item.
@@ -136,7 +992,7 @@ export class Login {
             }
         });
     }
-    
+
     /**
      * Test Token
      * Test access token
@@ -149,7 +1005,7 @@ export class Login {
             url: '/api/v1/login/test-token'
         });
     }
-    
+
     /**
      * Recover Password
      * Password Recovery
@@ -170,7 +1026,7 @@ export class Login {
             }
         });
     }
-    
+
     /**
      * Reset Password
      * Reset password
@@ -190,7 +1046,7 @@ export class Login {
             }
         });
     }
-    
+
     /**
      * Recover Password Html Content
      * HTML Content for Password Recovery
@@ -258,7 +1114,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Create User
      * Create new user.
@@ -278,7 +1134,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Read User Me
      * Get current user.
@@ -291,7 +1147,7 @@ export class Users {
             url: '/api/v1/users/me'
         });
     }
-    
+
     /**
      * Delete User Me
      * Delete own user.
@@ -304,7 +1160,7 @@ export class Users {
             url: '/api/v1/users/me'
         });
     }
-    
+
     /**
      * Update User Me
      * Update own user.
@@ -324,7 +1180,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Update Password Me
      * Update own password.
@@ -344,7 +1200,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Register User
      * Create new user without the need to be logged in.
@@ -364,7 +1220,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Read User By Id
      * Get a specific user by id.
@@ -385,7 +1241,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Update User
      * Update a user.
@@ -409,7 +1265,7 @@ export class Users {
             }
         });
     }
-    
+
     /**
      * Delete User
      * Delete a user.
@@ -453,7 +1309,7 @@ export class Utils {
             }
         });
     }
-    
+
     /**
      * Health Check
      * @returns boolean Successful Response
@@ -463,6 +1319,488 @@ export class Utils {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/utils/health-check/'
+        });
+    }
+}
+
+export class Weaves {
+    /**
+     * Create Weave
+     * Create a new Weave.
+     *
+     * The current user will be added as the owner.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns WeavePublic Successful Response
+     * @throws ApiError
+     */
+    public static createWeave(data: WeavesCreateWeaveData): CancelablePromise<WeavesCreateWeaveResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List My Weaves
+     * Get all Weaves the current user has access to.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns WeavesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listMyWeaves(data: WeavesListMyWeavesData = {}): CancelablePromise<WeavesListMyWeavesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get Weave
+     * Get a specific Weave by ID.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @returns WeavePublic Successful Response
+     * @throws ApiError
+     */
+    public static getWeave(data: WeavesGetWeaveData): CancelablePromise<WeavesGetWeaveResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}',
+            path: {
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Weave
+     * Update a Weave.
+     *
+     * Only weave owners and admins can update weave settings.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WeavePublic Successful Response
+     * @throws ApiError
+     */
+    public static updateWeave(data: WeavesUpdateWeaveData): CancelablePromise<WeavesUpdateWeaveResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}',
+            path: {
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete Weave
+     * Delete a Weave (soft delete).
+     *
+     * Only weave owners can delete the weave. This will also soft delete
+     * all worlds within the weave.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteWeave(data: WeavesDeleteWeaveData): CancelablePromise<WeavesDeleteWeaveResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}',
+            path: {
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Weave Members
+     * Get all members of a Weave.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @returns WeaveUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static listWeaveMembers(data: WeavesListWeaveMembersData): CancelablePromise<WeavesListWeaveMembersResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/members',
+            path: {
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Add Weave Member
+     * Add a new member to a Weave.
+     *
+     * Only weave owners and admins can invite new members.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WeaveUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static addWeaveMember(data: WeavesAddWeaveMemberData): CancelablePromise<WeavesAddWeaveMemberResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/members',
+            path: {
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Member Role
+     * Update a member's role in a Weave.
+     *
+     * Only weave owners and admins can update member roles.
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WeaveUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateMemberRole(data: WeavesUpdateMemberRoleData): CancelablePromise<WeavesUpdateMemberRoleResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/members/{user_id}',
+            path: {
+                user_id: data.userId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Remove Weave Member
+     * Remove a member from a Weave.
+     *
+     * Only weave owners and admins can remove members.
+     * Users cannot remove the last owner.
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static removeWeaveMember(data: WeavesRemoveWeaveMemberData): CancelablePromise<WeavesRemoveWeaveMemberResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/members/{user_id}',
+            path: {
+                user_id: data.userId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class Worlds {
+    /**
+     * Create World
+     * Create a new World within a Weave.
+     *
+     * The current user will be added as the admin.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WorldPublic Successful Response
+     * @throws ApiError
+     */
+    public static createWorld(data: WorldsCreateWorldData): CancelablePromise<WorldsCreateWorldResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/',
+            path: {
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Weave Worlds
+     * Get all Worlds in a Weave that the current user has access to.
+     * @param data The data for the request.
+     * @param data.weaveId
+     * @param data.skip
+     * @param data.limit
+     * @returns WorldsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listWeaveWorlds(data: WorldsListWeaveWorldsData): CancelablePromise<WorldsListWeaveWorldsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/',
+            path: {
+                weave_id: data.weaveId
+            },
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List Public Worlds
+     * Get all public Worlds (no authentication required).
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns WorldsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listPublicWorlds(data: WorldsListPublicWorldsData = {}): CancelablePromise<WorldsListPublicWorldsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/public',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Get World
+     * Get a specific World by ID.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns WorldPublic Successful Response
+     * @throws ApiError
+     */
+    public static getWorld(data: WorldsGetWorldData): CancelablePromise<WorldsGetWorldResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update World
+     * Update a World.
+     *
+     * Only world admins and weave owners/admins can update world settings.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WorldPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateWorld(data: WorldsUpdateWorldData): CancelablePromise<WorldsUpdateWorldResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Delete World
+     * Delete a World (soft delete).
+     *
+     * Only world admins and weave owners/admins can delete the world.
+     * This will also soft delete all entries within the world.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteWorld(data: WorldsDeleteWorldData): CancelablePromise<WorldsDeleteWorldResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * List World Members
+     * Get all members of a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns WorldUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static listWorldMembers(data: WorldsListWorldMembersData): CancelablePromise<WorldsListWorldMembersResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/members',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Add World Member
+     * Add a new member to a World.
+     *
+     * Only world admins and weave owners/admins can invite new members.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WorldUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static addWorldMember(data: WorldsAddWorldMemberData): CancelablePromise<WorldsAddWorldMemberResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/members',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Update Member Role
+     * Update a member's role in a World.
+     *
+     * Only world admins and weave owners/admins can update member roles.
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns WorldUserPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateMemberRole(data: WorldsUpdateMemberRoleData): CancelablePromise<WorldsUpdateMemberRoleResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/members/{user_id}',
+            path: {
+                user_id: data.userId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+
+    /**
+     * Remove World Member
+     * Remove a member from a World.
+     *
+     * Only world admins and weave owners/admins can remove members.
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static removeWorldMember(data: WorldsRemoveWorldMemberData): CancelablePromise<WorldsRemoveWorldMemberResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/members/{user_id}',
+            path: {
+                user_id: data.userId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
         });
     }
 }

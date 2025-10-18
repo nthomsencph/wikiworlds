@@ -1,40 +1,63 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to LLMs when working with code in this repository.
 
 ## Project Overview
 
-This is a full-stack FastAPI + Next.js template based on the official FastAPI Full Stack Template. It provides a complete modern web application stack with authentication, database management, and a responsive dashboard.
+**WikiWorlds** is a sophisticated worldbuilding and collaborative wiki system for authors, D&D Dungeon Masters, and creative writers. Create richly detailed fictional universes with temporal tracking, hierarchical organization, and collaborative editing.
 
-**Tech Stack:**
-- **Backend**: FastAPI (Python), SQLModel (ORM), PostgreSQL, Alembic (migrations)
-- **Frontend**: Next.js 15 (App Router), TypeScript, Chakra UI v3, TanStack Query
-- **Infrastructure**: Docker Compose, Traefik (reverse proxy)
-- **Development**: uv (Python), npm (Node.js), pre-commit hooks
+**Key Features:**
+- 🌍 Multi-world management within workspaces (Weaves)
+- ⏰ Temporal system: Track when entities exist in your fictional timeline
+- 🌳 Hierarchical organization with PostgreSQL ltree
+- 🎨 Custom entry types with user-defined fields
+- 📝 Block-based rich text editor (TipTap)
+- 🔄 Temporal field values: Properties that change over time
+- 👥 Multi-user collaboration with role-based permissions
+
+## Tech Stack
+
+**Backend:**
+- FastAPI (Python 3.12+)
+- SQLModel (ORM)
+- PostgreSQL 15+ with ltree extension
+- Alembic (migrations)
+- uv (package manager)
+
+**Frontend:**
+- Next.js 15 (App Router)
+- React 19
+- TypeScript
+- Chakra UI v3
+- TanStack Query v5
+- TipTap v3 (rich text editor)
+- Framer Motion (animations)
+
+**Infrastructure:**
+- Docker Compose
+- Traefik (reverse proxy)
+- Pre-commit hooks
 
 ## Development Commands
 
-### Starting the Stack
+### Quick Start
 
 ```bash
-# Start all services with hot reload (recommended for development)
+# Start all services with hot reload
 docker compose watch
 
-# Stop all services
+# Stop services
 docker compose down
 
 # View logs
-docker compose logs
 docker compose logs backend
 docker compose logs frontend
 ```
 
 ### Backend Development
 
-**Location**: `backend/`
-
 ```bash
-# Install dependencies (from backend/ directory)
+# Location: backend/
+
+# Install dependencies
 uv sync
 
 # Activate virtual environment
@@ -43,203 +66,260 @@ source .venv/bin/activate
 # Run tests
 bash ./scripts/test.sh
 
-# Run tests in running container
-docker compose exec backend bash scripts/tests-start.sh
-
-# Run tests with additional pytest args (e.g., stop on first error)
-docker compose exec backend bash scripts/tests-start.sh -x
-
-# Run backend locally (after stopping Docker service)
-docker compose stop backend
-cd backend
-fastapi dev app/main.py
-
-# Code linting/formatting (from root directory)
-uv run pre-commit run --all-files
-
-# Database migrations (inside backend container)
-docker compose exec backend bash
+# Create migration
 alembic revision --autogenerate -m "Description"
+
+# Apply migrations
 alembic upgrade head
 
-# Type checking
-mypy backend/app
+# Run locally (after stopping Docker backend)
+docker compose stop backend
+fastapi dev app/main.py
 
-# Access backend container shell
-docker compose exec backend bash
+# Code quality
+uv run pre-commit run --all-files
 ```
 
 ### Frontend Development
 
-**Location**: `frontend/`
-
 ```bash
-# Install dependencies (from frontend/ directory)
+# Location: frontend/
+
+# Install dependencies
 npm install
 
-# Run frontend locally (after stopping Docker service)
+# Run locally (after stopping Docker frontend)
 docker compose stop frontend
-cd frontend
 npm run dev
 
-# Build for production
-npm run build
+# Regenerate API client (after backend changes)
+npm run generate-client
 
-# Start production server
-npm start
-
-# Lint
-npm run lint
+# Lint and format
 npm run lint:fix
-
-# Format code
 npm run format
-npm run format:check
 
 # Type check
 npm run type-check
-
-# Generate API client from backend OpenAPI spec
-npm run generate-client
-```
-
-### Running Single Tests
-
-```bash
-# Backend: Run specific test file
-docker compose exec backend bash -c "pytest app/tests/api/routes/test_users.py -v"
-
-# Backend: Run specific test function
-docker compose exec backend bash -c "pytest app/tests/api/routes/test_users.py::test_create_user -v"
-
-# Backend: Run with coverage
-docker compose exec backend bash -c "pytest --cov=app --cov-report=html"
 ```
 
 ## Architecture
 
 ### Backend Structure
 
-The backend follows a layered architecture pattern:
-
-- **`app/main.py`**: FastAPI application entry point with CORS and Sentry configuration
-- **`app/api/`**: API layer with route definitions
-  - `app/api/main.py`: Router aggregation (includes login, users, items, utils, private routes)
-  - `app/api/routes/`: Individual route modules (login, users, items, utils, private)
-  - `app/api/deps.py`: Dependency injection (database sessions, current user, permissions)
-- **`app/models/`**: SQLModel data models (User, Item) - these define both Pydantic schemas and SQL tables
-- **`app/db/`**: Database layer
-  - `app/db/database.py`: Database engine and session configuration
-  - `app/db/crud/`: CRUD operations for each model
-- **`app/core/`**: Core functionality (security, authentication)
-- **`app/config.py`**: Application settings using pydantic-settings
-- **`app/alembic/`**: Database migration files
-- **`app/tests/`**: Test suite organized by layer (api, crud, utils)
+```
+backend/app/
+├── main.py                    # FastAPI app entry point
+├── config.py                  # Settings (reads from .env)
+├── api/
+│   ├── main.py               # API router aggregation
+│   ├── deps.py               # Common dependencies (auth, db)
+│   ├── deps_worldbuilding.py # Weave/World context dependencies
+│   └── routes/               # API endpoints
+│       ├── login.py, users.py, items.py
+│       ├── weaves.py         # Workspace management
+│       ├── worlds.py         # Universe/campaign management
+│       ├── entry_types.py    # Custom entry schemas
+│       ├── entries.py        # Wiki pages (core content)
+│       └── blocks.py         # Block-based content
+├── models/                   # SQLModel data models
+│   ├── user.py, item.py      # Legacy models
+│   ├── weave.py              # Weave, World (multi-tenancy)
+│   ├── entry.py              # EntryType, Entry, FieldValue
+│   ├── block.py              # Block, Comment, Attachment
+│   ├── reference.py          # Relationships, Tags
+│   ├── timeline.py           # Timeline, Era
+│   ├── versioning.py         # Version history, Activity log
+│   ├── permission.py         # ABAC permissions, Teams
+│   └── schemas/              # Pydantic request/response schemas
+├── db/
+│   ├── database.py           # Database engine, session
+│   └── crud/                 # CRUD operations
+│       ├── weave.py, world.py, entry_type.py
+│       ├── entry.py          # Entry + field CRUD with temporal support
+│       └── block.py
+├── core/
+│   └── security.py           # JWT authentication
+├── utils/
+│   ├── ltree.py              # Ltree path utilities
+│   └── temporal.py           # Temporal query helpers
+└── alembic/                  # Database migrations
+```
 
 **Key patterns:**
-- Routes depend on CRUD functions for database operations
-- Authentication uses JWT tokens via `app/core/security.py`
-- Dependencies injected through `app/api/deps.py` (e.g., `get_current_user`, `get_db`)
-- Settings managed via `app/config.py` which reads from `.env`
+- Routes → CRUD → SQLModel (layered architecture)
+- JWT authentication via `app/core/security.py`
+- Dependency injection for auth, db, permissions
+- Settings from `.env` via `app/config.py`
+- Worldbuilding routes nested: `/api/v1/weaves/{weave_id}/worlds/{world_id}/entries/`
 
 ### Frontend Structure
 
-Next.js App Router with server and client components:
+```
+frontend/src/
+├── app/                      # Next.js App Router
+│   ├── layout.tsx           # Root layout (Chakra, TanStack Query)
+│   ├── (protected)/         # Authenticated routes
+│   │   ├── layout.tsx       # Protected layout (conditional sidebar)
+│   │   ├── weaves/          # Main app (worldbuilding)
+│   │   │   ├── page.tsx     # Auto-redirect to first weave
+│   │   │   └── [weaveId]/worlds/[worldId]/
+│   │   │       ├── page.tsx              # World dashboard
+│   │   │       ├── entries/[entryId]/    # Entry detail (WIP)
+│   │   │       └── entry-types/          # Type management (WIP)
+│   │   ├── settings/, admin/, items/  # Legacy admin
+│   └── login/, signup/      # Public auth pages
+├── components/
+│   ├── Weaves/              # Worldbuilding components
+│   ├── Worlds/
+│   ├── Common/              # Navbar, Sidebar, UserMenu
+│   ├── ui/                  # Chakra UI components
+│   ├── Dock.tsx             # macOS-style animated dock
+│   ├── Masonry.tsx          # Pinterest-style card grid
+│   ├── AnimatedList.tsx
+│   └── LiquidEther.tsx      # Three.js background
+├── client/                  # Auto-generated API client
+│   ├── sdk.gen.ts
+│   └── types.gen.ts
+├── hooks/                   # Custom React hooks
+├── lib/                     # Utilities
+└── theme/                   # Chakra UI v3 theme
 
-- **`src/app/`**: Next.js App Router pages
-  - `src/app/(protected)/`: Route group for authenticated pages (settings, admin, items)
-  - `src/app/login/`, `src/app/signup/`: Public authentication pages
-  - `src/app/layout.tsx`: Root layout with theme provider and query client
-- **`src/components/`**: React components organized by feature
-  - `src/components/Common/`: Shared components (Navbar, Sidebar, ActionsMenu)
-  - `src/components/Items/`, `src/components/Admin/`, `src/components/UserSettings/`: Feature-specific components
-  - `src/components/ui/`: Chakra UI primitives and custom UI components
-- **`src/client/`**: Auto-generated TypeScript API client from OpenAPI spec
-- **`src/hooks/`**: Custom React hooks (auth, queries)
-- **`src/lib/`**: Utilities and helper functions
-- **`src/theme/`**: Chakra UI theme configuration
+editor/                      # Standalone TipTap editor
+├── full-editor.tsx
+├── page-editor.tsx
+├── title-editor.tsx
+├── components/              # Bubble menu, slash menu, etc.
+├── extensions/              # TipTap extensions
+└── styles/                  # Editor CSS
+```
 
 **Key patterns:**
-- Protected routes wrapped in `(protected)` group - authentication handled via middleware
-- State management via TanStack Query for server state
-- API calls use auto-generated client from `src/client/`
-- Forms use React Hook Form with Chakra UI components
-- Dark mode support via Chakra UI theme system
+- All weave pages are client components (`"use client"`)
+- TanStack Query for API calls with automatic caching
+- Auto-generated TypeScript client from OpenAPI
+- Weaves section uses custom layout (no standard sidebar)
+- World dashboard has multiple view modes: Dashboard (Masonry), Tree, Timeline, Search, Knowledge Graph
 
-### Database Migrations
+## Important Concepts
 
-When modifying SQLModel models in `backend/app/models/`:
+### 1. Temporal System
 
-1. Make model changes
-2. Create migration: `docker compose exec backend bash -c "alembic revision --autogenerate -m 'description'"`
-3. Review generated migration in `backend/app/alembic/versions/`
-4. Apply migration: `docker compose exec backend bash -c "alembic upgrade head"`
+**All entities can exist at specific points in the fictional timeline.**
 
-**Note**: Migrations run automatically via `prestart` service in Docker Compose, but must be created manually during development.
+Every temporal entity has:
+```python
+timeline_start_year: int | None   # None = ancient/unknown
+timeline_end_year: int | None     # None = ongoing/current
+timeline_is_circa: bool           # Approximate dates
+timeline_is_ongoing: bool         # Still exists
+```
 
-### API Client Generation
+**What is temporal:**
+- **Entries**: When does this character/place exist?
+- **Field Values**: Properties that change over time (e.g., "Ruler" field)
+- **Blocks**: Content describing specific time periods
+- **References**: Relationships valid for specific periods
 
-The frontend uses an auto-generated TypeScript client based on the backend's OpenAPI schema:
+**Temporal queries:**
+```python
+# Get entries that existed in year 250
+entries = session.exec(
+    select(Entry)
+    .where(Entry.world_id == world_id)
+    .where((Entry.timeline_start_year == None) | (Entry.timeline_start_year <= 250))
+    .where((Entry.timeline_end_year == None) | (Entry.timeline_end_year >= 250))
+).all()
+```
 
-1. Backend must be running: `docker compose up backend`
-2. Generate client: `cd frontend && npm run generate-client`
-3. Client generated in `frontend/src/client/`
+**Important:** Always handle NULL properly:
+- NULL start = existed since ancient times
+- NULL end = still exists/ongoing
 
-Regenerate whenever backend API changes (new endpoints, modified schemas).
+**API support:** All temporal endpoints accept `?timeline_year=250` parameter.
 
-### Environment Configuration
+### 2. Hierarchical Organization (ltree)
 
-Configuration via `.env` file at project root:
+**Entries are organized in a tree using PostgreSQL ltree extension.**
 
-- `DOMAIN`: Base domain for Traefik routing (use `localhost` for local development)
-- `FRONTEND_HOST`: Frontend URL used by backend for email links
-- `ENVIRONMENT`: `local`, `staging`, or `production`
-- `SECRET_KEY`: JWT signing key (generate with `python -c "import secrets; print(secrets.token_urlsafe(32))"`)
-- `FIRST_SUPERUSER` / `FIRST_SUPERUSER_PASSWORD`: Initial admin credentials
-- `POSTGRES_*`: Database connection settings
-- `BACKEND_CORS_ORIGINS`: Comma-separated allowed CORS origins
+Path format: `"uuid1.uuid2.uuid3"` (UUIDs avoid naming conflicts)
 
-### Docker Compose Configuration
+Example tree:
+```
+World: Middle Earth
+├── regions (path: "regions_uuid")
+│   ├── eriador (path: "regions_uuid.eriador_uuid")
+│   │   └── shire (path: "regions_uuid.eriador_uuid.shire_uuid")
+│   └── gondor (path: "regions_uuid.gondor_uuid")
+└── characters (path: "characters_uuid")
+    └── aragorn (path: "characters_uuid.aragorn_uuid")
+```
 
-- **`docker-compose.yml`**: Base production configuration
-- **`docker-compose.override.yml`**: Development overrides (volume mounts, hot reload)
-- **`docker-compose.traefik.yml`**: Traefik proxy configuration for production
+**Queries:**
+- Get descendants: `WHERE path <@ 'parent.path'`
+- Get ancestors: `WHERE 'entry.path' <@ path`
+- Get direct children: `WHERE path ~ 'parent.path.*{1}'`
 
-Services: `db` (PostgreSQL), `backend`, `frontend`, `adminer` (database UI), `prestart` (migrations/init)
+**Utilities:** Use `backend/app/utils/ltree.py` for path manipulation.
 
-Development mode mounts source code as volumes for hot reloading.
+**Index:** Requires GiST index: `CREATE INDEX idx_entry_path_gist ON entry USING gist(path);`
 
-### Pre-commit Hooks
+### 3. Block-Based Content
 
-The project uses pre-commit for code quality:
+**Entries use blocks instead of a single content field (Notion-style).**
 
-- **Setup**: `uv run pre-commit install` (run once)
-- **Manual run**: `uv run pre-commit run --all-files`
-- **Tools**: ruff (Python linting/formatting), eslint, prettier (JS/TS)
+**Benefits:**
+- Granular versioning
+- Temporal blocks (different content for different time periods)
+- Rich content types (tables, code, math, embeds)
+- Reusable content
 
-Hooks run automatically on `git commit`.
+**Block types:**
+- Text: paragraph, heading1-3, quote, callout
+- Lists: bullet_list, numbered_list, checklist, toggle_list
+- Media: image, video, file, embed, audio
+- Structured: table, database_view, code, equation
+- Special: reference, timeline_event, map_marker, divider, table_of_contents
+
+**Each block has:**
+```python
+block_type: str           # Type of block
+content: dict             # JSON structure (varies by type)
+position: float           # Ordering (fractional indexing)
+timeline_start_year: int  # Optional temporal validity
+timeline_end_year: int
+```
+
+**API:** Blocks belong to entries, accessed via nested routes.
+
+### 4. Multi-Tenancy (Weave → World → Entry)
+
+**Three-level hierarchy:**
+- **Weave**: Workspace/tenant (like Notion workspace)
+  - Has members with roles: owner, admin, member
+  - Contains multiple Worlds
+- **World**: Universe/campaign (like Notion database)
+  - Has members with roles: admin, editor, commenter, viewer
+  - Contains Entries
+- **Entry**: Wiki page with custom fields
+
+**Permission cascade:** Weave admins automatically have access to all Worlds in that Weave.
 
 ## Development URLs
 
-**Standard (localhost):**
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 - API Docs (Swagger): http://localhost:8000/docs
-- API Docs (ReDoc): http://localhost:8000/redoc
 - Adminer (DB): http://localhost:8080
 - Traefik UI: http://localhost:8090
 
-**With localhost.tiangolo.com (subdomain testing):**
-Set `DOMAIN=localhost.tiangolo.com` in `.env`, then:
-- Frontend: http://dashboard.localhost.tiangolo.com
-- Backend: http://api.localhost.tiangolo.com
-- API Docs: http://api.localhost.tiangolo.com/docs
-
 ## Important Notes
 
-- The backend uses `uv` for Python dependency management (not pip/poetry)
-- Frontend API client must be regenerated after backend schema changes
-- Always create Alembic migrations when modifying models - auto table creation is disabled
-- Private debug routes in `app/api/routes/private.py` only available in local environment
-- Tests use a separate test database configured in `backend/app/tests/conftest.py`
-- Backend virtual environment location: `backend/.venv/bin/python`
+- **Package manager**: Backend uses `uv` (not pip/poetry)
+- **Migrations**: Always create with `alembic revision --autogenerate`, then apply with `alembic upgrade head`
+- **ltree required**: PostgreSQL ltree extension must be enabled (migration `001_enable_ltree_extension.py`)
+- **API client**: Regenerate after backend changes: `npm run generate-client`
+- **Temporal queries**: Always handle NULL start/end years (ancient/ongoing entities)
+- **Field values**: Stored as JSON dicts, wrap simple values: `{"text": "value"}` or `{"number": 42}`
+- **Chakra UI v3**: Breaking changes from v2, use MCP tools to verify correct usage
+- **Block sync**: Backend Block model is separate from TipTap document structure

@@ -1,0 +1,14 @@
+.list {
+  column-count: 4;
+  column-width: 1px;
+  /* Force 4 columns by setting minimum width very small */
+  column-gap: 1%;
+  width: 100%;
+}
+
+.item-wrapper {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  display: inline-block;
+  width: 100%;
+}

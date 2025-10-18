@@ -10,7 +10,7 @@ import { ClientOnly } from "../client-only"
 export function CustomProvider(props: PropsWithChildren) {
   return (
     <ChakraProvider value={system}>
-      <ClientOnly fallback={<div style={{ opacity: 0 }}>{props.children}</div>}>
+      <ClientOnly fallback={<div suppressHydrationWarning style={{ opacity: 0 }}>{props.children}</div>}>
         <ColorModeProvider
           defaultTheme="system"
           storageKey="chakra-ui-color-mode"

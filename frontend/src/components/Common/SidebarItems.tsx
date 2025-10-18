@@ -1,10 +1,11 @@
 import { Box, Flex, Icon, Text } from "@chakra-ui/react"
 import Link from "next/link"
-import { FiBriefcase, FiHome } from "react-icons/fi"
+import { FiBriefcase, FiHome, FiLayers } from "react-icons/fi"
 import type { IconType } from "react-icons/lib"
 
 const items = [
   { icon: FiHome, title: "Dashboard", path: "/" },
+  { icon: FiLayers, title: "Weaves", path: "/weaves" },
   { icon: FiBriefcase, title: "Items", path: "/items" },
 ]
 
