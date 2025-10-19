@@ -499,6 +499,8 @@ export type UserCreate = {
     is_active?: boolean;
     is_superuser?: boolean;
     full_name?: (string | null);
+    last_accessed_weave_id?: (string | null);
+    last_active_at?: (string | null);
     password: string;
 };
 
@@ -507,7 +509,11 @@ export type UserPublic = {
     is_active?: boolean;
     is_superuser?: boolean;
     full_name?: (string | null);
+    last_accessed_weave_id?: (string | null);
+    last_active_at?: (string | null);
     id: string;
+    weave_count?: number;
+    world_count?: number;
 };
 
 export type UserRegister = {
@@ -526,12 +532,15 @@ export type UserUpdate = {
     is_active?: boolean;
     is_superuser?: boolean;
     full_name?: (string | null);
+    last_accessed_weave_id?: (string | null);
+    last_active_at?: (string | null);
     password?: (string | null);
 };
 
 export type UserUpdateMe = {
     full_name?: (string | null);
     email?: (string | null);
+    last_accessed_weave_id?: (string | null);
 };
 
 export type ValidationError = {

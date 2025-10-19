@@ -1,10 +1,12 @@
 """CRUD operations for Weave and WeaveUser models."""
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from sqlmodel import Session, col, select
 
+from app.models.user import User
 from app.models.weave import Weave, WeaveUser
 
 
@@ -36,6 +38,13 @@ def create_weave(
         role="owner",
     )
     session.add(weave_user)
+
+    # Update user's last accessed weave since they just created it
+    user = session.get(User, user_id)
+    if user:
+        user.last_accessed_weave_id = db_weave.id
+        session.add(user)
+
     session.commit()
     session.refresh(db_weave)
 
@@ -126,10 +135,18 @@ def delete_weave(*, session: Session, weave: Weave) -> None:
         session: Database session
         weave: Weave object to delete
     """
-    from datetime import datetime
-
     weave.deleted_at = datetime.utcnow()
     session.add(weave)
+
+    # Clear last_accessed_weave_id for any users who had this weave as their last accessed
+    users_to_update = session.exec(
+        select(User).where(User.last_accessed_weave_id == weave.id)
+    ).all()
+
+    for user in users_to_update:
+        user.last_accessed_weave_id = None
+        session.add(user)
+
     session.commit()
 
 

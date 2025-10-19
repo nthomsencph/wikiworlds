@@ -1231,7 +1231,7 @@ export class Tags {
 export class Users {
     /**
      * Read Users
-     * Retrieve users.
+     * Retrieve users with weave and world counts.
      * @param data The data for the request.
      * @param data.skip
      * @param data.limit

@@ -11,10 +11,10 @@ import {
   Grid,
   Image,
 } from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   FiPlus,
   FiGlobe,
@@ -24,7 +24,8 @@ import {
 } from "react-icons/fi"
 import { motion, AnimatePresence } from "framer-motion"
 
-import { Weaves as WeavesAPI, Worlds as WorldsAPI } from "@/client"
+import { Weaves as WeavesAPI, Worlds as WorldsAPI, Users } from "@/client"
+import useAuth from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import CreateWorldModal from "@/components/Worlds/CreateWorldModal"
 import LiquidEther from "@/components/LiquidEther"
@@ -38,6 +39,8 @@ export default function WeaveDetail() {
   const router = useRouter()
   const params = useParams()
   const weaveId = params.weaveId as string
+  const queryClient = useQueryClient()
+  const { user: currentUser } = useAuth()
   const [page, setPage] = useState(1)
   const [isCreateWorldModalOpen, setIsCreateWorldModalOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -62,6 +65,27 @@ export default function WeaveDetail() {
 
   const worlds = worldsData?.data ?? []
   const count = worldsData?.count ?? 0
+
+  // Update user's last_accessed_weave_id when they visit this weave page
+  useEffect(() => {
+    if (
+      currentUser &&
+      weaveId &&
+      currentUser.last_accessed_weave_id !== weaveId
+    ) {
+      // Silently update last accessed weave in the background
+      Users.updateUserMe({
+        requestBody: { last_accessed_weave_id: weaveId },
+      })
+        .then(() => {
+          // Invalidate current user query to refresh the data
+          queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+        })
+        .catch(() => {
+          // Silently fail - not critical if this doesn't update
+        })
+    }
+  }, [weaveId, currentUser, queryClient])
 
   if (weaveLoading || worldsLoading) {
     return (

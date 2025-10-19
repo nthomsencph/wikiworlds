@@ -1,15 +1,29 @@
+"use client"
+
 import { Box, Flex, IconButton } from "@chakra-ui/react"
-import Link from "next/link"
-import { FiLogOut, FiUser } from "react-icons/fi"
+import { useState } from "react"
+import { FiLogOut, FiUser, FiShield } from "react-icons/fi"
+import { useRouter } from "next/navigation"
 
 import useAuth from "@/hooks/useAuth"
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "../ui/menu"
+import UserSettingsDrawer from "./UserSettingsDrawer"
 
 const UserMenu = () => {
   const { user, logout } = useAuth()
+  const router = useRouter()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const handleLogout = async () => {
     logout()
+  }
+
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true)
+  }
+
+  const handleAdminClick = () => {
+    router.push("/admin")
   }
 
   return (
@@ -23,25 +37,40 @@ const UserMenu = () => {
               variant="ghost"
               size="sm"
               aria-label="User menu"
+              _dark={{ color: "white", _hover: { color: "gray.700" } }}
             >
               <FiUser fontSize="16" />
             </IconButton>
           </MenuTrigger>
 
           <MenuContent borderRadius="2xl" overflow="hidden">
-            <Link href="/settings" style={{ textDecoration: "none" }}>
+            <MenuItem
+              closeOnSelect
+              value="user-settings"
+              gap={2}
+              py={2}
+              onClick={handleOpenSettings}
+              style={{ cursor: "pointer" }}
+              _focus={{ outline: "none" }}
+            >
+              <FiUser fontSize="18px" />
+              <Box flex="1">Account</Box>
+            </MenuItem>
+
+            {user?.is_superuser && (
               <MenuItem
                 closeOnSelect
-                value="user-settings"
+                value="admin"
                 gap={2}
                 py={2}
+                onClick={handleAdminClick}
                 style={{ cursor: "pointer" }}
                 _focus={{ outline: "none" }}
               >
-                <FiUser fontSize="18px" />
-                <Box flex="1">Account</Box>
+                <FiShield fontSize="18px" />
+                <Box flex="1">Admin</Box>
               </MenuItem>
-            </Link>
+            )}
 
             <MenuItem
               value="logout"
@@ -57,6 +86,11 @@ const UserMenu = () => {
           </MenuContent>
         </MenuRoot>
       </Flex>
+
+      <UserSettingsDrawer
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </>
   )
 }

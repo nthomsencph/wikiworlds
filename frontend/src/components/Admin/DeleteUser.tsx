@@ -57,7 +57,16 @@ const DeleteUser = ({ id }: { id: string }) => {
       onOpenChange={({ open }) => setIsOpen(open)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" colorPalette="red">
+        <Button
+          variant="ghost"
+          size="sm"
+          colorPalette="red"
+          _dark={{
+            color: "red.300",
+            bg: "transparent",
+            _hover: { bg: "transparent", color: "red.300" },
+          }}
+        >
           <FiTrash2 fontSize="16px" />
           Delete User
         </Button>
@@ -79,15 +88,18 @@ const DeleteUser = ({ id }: { id: string }) => {
             <DialogActionTrigger asChild>
               <Button
                 variant="subtle"
-                colorPalette="gray"
+                colorPalette="black"
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
             </DialogActionTrigger>
             <Button
-              variant="solid"
+              variant="subtle"
               colorPalette="red"
+              color="black"
+              size="sm"
+              _dark={{ color: "white" }}
               type="submit"
               loading={isSubmitting}
             >

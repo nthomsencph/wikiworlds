@@ -72,9 +72,6 @@ const UserInformation = () => {
   return (
     <>
       <Container maxW="full">
-        <Heading size="sm" py={4}>
-          User Information
-        </Heading>
         <Box
           w={{ sm: "full", md: "sm" }}
           as="form"

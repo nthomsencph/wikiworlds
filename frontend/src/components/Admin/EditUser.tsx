@@ -3,6 +3,7 @@ import { Controller, type SubmitHandler, useForm } from "react-hook-form"
 
 import {
   Button,
+  Checkbox,
   DialogActionTrigger,
   DialogRoot,
   DialogTrigger,
@@ -18,7 +19,6 @@ import { type UserPublic, type UserUpdate, Users } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { emailPattern, handleError } from "@/utils"
-import { Checkbox } from "../ui/checkbox"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -85,7 +85,18 @@ const EditUser = ({ user }: EditUserProps) => {
       onOpenChange={({ open }) => setIsOpen(open)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          color="black"
+          bg="gray.100"
+          _dark={{
+            bg: "transparent",
+            color: "white",
+            _hover: { bg: "transparent", color: "white" },
+          }}
+          borderRadius="full"
+        >
           <FaExchangeAlt fontSize="16px" />
           Edit User
         </Button>
@@ -169,28 +180,32 @@ const EditUser = ({ user }: EditUserProps) => {
                 control={control}
                 name="is_superuser"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
-                    >
-                      Is superuser?
-                    </Checkbox>
-                  </Field>
+                  <Checkbox.Root
+                    disabled={field.disabled}
+                    checked={field.value}
+                    onCheckedChange={({ checked }) => field.onChange(checked)}
+                    colorPalette="teal"
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control />
+                    <Checkbox.Label>Is superuser?</Checkbox.Label>
+                  </Checkbox.Root>
                 )}
               />
               <Controller
                 control={control}
                 name="is_active"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
-                    >
-                      Is active?
-                    </Checkbox>
-                  </Field>
+                  <Checkbox.Root
+                    disabled={field.disabled}
+                    checked={field.value}
+                    onCheckedChange={({ checked }) => field.onChange(checked)}
+                    colorPalette="teal"
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control />
+                    <Checkbox.Label>Is active?</Checkbox.Label>
+                  </Checkbox.Root>
                 )}
               />
             </Flex>

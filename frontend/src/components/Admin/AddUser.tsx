@@ -7,6 +7,7 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { emailPattern, handleError } from "@/utils"
 import {
   Button,
+  Checkbox,
   DialogActionTrigger,
   DialogTitle,
   Flex,
@@ -16,7 +17,6 @@ import {
 } from "@chakra-ui/react"
 import { useState } from "react"
 import { FaPlus } from "react-icons/fa"
-import { Checkbox } from "../ui/checkbox"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -102,7 +102,7 @@ const AddUser = () => {
                 required
                 invalid={!!errors.email}
                 errorText={errors.email?.message}
-                label="Email"
+                //label="Email"
               >
                 <Input
                   id="email"
@@ -112,19 +112,21 @@ const AddUser = () => {
                   })}
                   placeholder="Email"
                   type="email"
+                  borderRadius="full"
                 />
               </Field>
 
               <Field
                 invalid={!!errors.full_name}
                 errorText={errors.full_name?.message}
-                label="Full Name"
+                //label="Full Name"
               >
                 <Input
                   id="name"
                   {...register("full_name")}
                   placeholder="Full name"
                   type="text"
+                  borderRadius="full"
                 />
               </Field>
 
@@ -132,7 +134,7 @@ const AddUser = () => {
                 required
                 invalid={!!errors.password}
                 errorText={errors.password?.message}
-                label="Set Password"
+                //label="Set Password"
               >
                 <Input
                   id="password"
@@ -145,6 +147,7 @@ const AddUser = () => {
                   })}
                   placeholder="Password"
                   type="password"
+                  borderRadius="full"
                 />
               </Field>
 
@@ -152,7 +155,7 @@ const AddUser = () => {
                 required
                 invalid={!!errors.confirm_password}
                 errorText={errors.confirm_password?.message}
-                label="Confirm Password"
+                //label="Confirm Password"
               >
                 <Input
                   id="confirm_password"
@@ -162,8 +165,9 @@ const AddUser = () => {
                       value === getValues().password ||
                       "The passwords do not match",
                   })}
-                  placeholder="Password"
+                  placeholder="Confirm password"
                   type="password"
+                  borderRadius="full"
                 />
               </Field>
             </VStack>
@@ -173,28 +177,32 @@ const AddUser = () => {
                 control={control}
                 name="is_superuser"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
-                    >
-                      Is superuser?
-                    </Checkbox>
-                  </Field>
+                  <Checkbox.Root
+                    disabled={field.disabled}
+                    checked={field.value}
+                    onCheckedChange={({ checked }) => field.onChange(checked)}
+                    colorPalette="teal"
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control borderRadius="full" />
+                    <Checkbox.Label>Is superuser?</Checkbox.Label>
+                  </Checkbox.Root>
                 )}
               />
               <Controller
                 control={control}
                 name="is_active"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
-                    >
-                      Is active?
-                    </Checkbox>
-                  </Field>
+                  <Checkbox.Root
+                    disabled={field.disabled}
+                    checked={field.value}
+                    onCheckedChange={({ checked }) => field.onChange(checked)}
+                    colorPalette="teal"
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control borderRadius="full" />
+                    <Checkbox.Label>Is active?</Checkbox.Label>
+                  </Checkbox.Root>
                 )}
               />
             </Flex>
@@ -211,7 +219,7 @@ const AddUser = () => {
               </Button>
             </DialogActionTrigger>
             <Button
-              variant="solid"
+              variant="subtle"
               type="submit"
               disabled={!isValid}
               loading={isSubmitting}

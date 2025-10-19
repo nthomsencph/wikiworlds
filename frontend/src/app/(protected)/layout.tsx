@@ -13,10 +13,11 @@ export default function ProtectedLayout({
 }) {
   const pathname = usePathname()
 
-  // Weaves section has its own layout, so skip the sidebar/navbar
+  // Weaves and Admin sections have their own layouts, so skip the sidebar/navbar
   const isWeavesSection = pathname.startsWith("/weaves")
+  const isAdminSection = pathname.startsWith("/admin")
 
-  if (isWeavesSection) {
+  if (isWeavesSection || isAdminSection) {
     return <>{children}</>
   }
 

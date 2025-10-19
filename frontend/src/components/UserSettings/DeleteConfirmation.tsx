@@ -59,7 +59,13 @@ const DeleteConfirmation = () => {
         onOpenChange={({ open }) => setIsOpen(open)}
       >
         <DialogTrigger asChild>
-          <Button variant="solid" colorPalette="red" mt={4}>
+          <Button
+            variant="subtle"
+            colorPalette="red"
+            color="white"
+            mt={4}
+            fontSize="xs"
+          >
             Delete
           </Button>
         </DialogTrigger>

@@ -2,6 +2,7 @@
 User-related models for authentication and user management.
 """
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from pydantic import EmailStr
@@ -17,6 +18,12 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
+    last_accessed_weave_id: uuid.UUID | None = Field(
+        default=None
+    )  # Tracks last accessed weave to auto-redirect on login
+    last_active_at: datetime | None = Field(
+        default=None
+    )  # Tracks when user was last active
 
 
 # Properties to receive via API on creation
@@ -39,6 +46,7 @@ class UserUpdate(UserBase):
 class UserUpdateMe(SQLModel):
     full_name: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = Field(default=None, max_length=255)
+    last_accessed_weave_id: uuid.UUID | None = Field(default=None)
 
 
 class UpdatePassword(SQLModel):
@@ -56,6 +64,8 @@ class User(UserBase, table=True):
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
+    weave_count: int = 0  # Computed field: number of weaves user has access to
+    world_count: int = 0  # Computed field: number of worlds user has access to
 
 
 class UsersPublic(SQLModel):
