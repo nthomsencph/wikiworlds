@@ -3,19 +3,16 @@
 Provides multi-tenancy context and permission checks for Weaves and Worlds.
 """
 
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Path, status
 from sqlmodel import Session
 
-from app.api.deps import get_db
+from app.api.deps import CurrentUser, get_db
 from app.db.crud import weave as weave_crud
 from app.db.crud import world as world_crud
 from app.models.weave import Weave, WeaveUser, World, WorldUser
-
-if TYPE_CHECKING:
-    from app.api.deps import CurrentUser
 
 
 def get_current_weave(

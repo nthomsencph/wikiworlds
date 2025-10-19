@@ -37,8 +37,16 @@ const useAuth = () => {
     mutationFn: (data: UserRegister) =>
       Users.registerUser({ requestBody: data }),
 
-    onSuccess: () => {
-      router.push("/login")
+    onSuccess: async (user, variables) => {
+      // Auto-login the user after signup
+      const loginData: AccessToken = {
+        username: variables.email,
+        password: variables.password,
+      }
+      await login(loginData)
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+      // Redirect to weaves page to create first weave
+      router.push("/weaves")
     },
     onError: (err: ApiError) => {
       handleError(err)
@@ -61,7 +69,7 @@ const useAuth = () => {
     mutationFn: login,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["currentUser"] })
-      router.push("/")
+      router.push("/weaves")
     },
     onError: (err: ApiError) => {
       handleError(err)

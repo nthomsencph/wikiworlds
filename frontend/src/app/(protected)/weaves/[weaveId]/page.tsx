@@ -192,19 +192,12 @@ export default function WeaveDetail() {
                 flex="1"
                 textAlign="center"
               >
-                <FiGlobe
-                  size={64}
-                  color="gray"
-                  style={{ marginBottom: "24px" }}
-                />
-                <Heading size="lg" mb={2}>
+                <Heading size="lg" mb={8} color="white">
                   No worlds yet
                 </Heading>
-                <Text color="gray.400" mb={6} maxW="md">
-                  Create your first world to start building entries and content.
-                </Text>
                 <Button
-                  colorPalette="blue"
+                  colorPalette="black"
+                  variant="subtle"
                   onClick={() => setIsCreateWorldModalOpen(true)}
                 >
                   <FiPlus />
