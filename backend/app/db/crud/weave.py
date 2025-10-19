@@ -3,12 +3,14 @@
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.models.weave import Weave, WeaveUser
 
 
-def create_weave(*, session: Session, weave_create: dict[str, Any], user_id: UUID) -> Weave:
+def create_weave(
+    *, session: Session, weave_create: dict[str, Any], user_id: UUID
+) -> Weave:
     """Create a new Weave and add the creator as owner.
 
     Args:
@@ -63,11 +65,15 @@ def get_weave_by_slug(*, session: Session, slug: str) -> Weave | None:
     Returns:
         Weave object or None if not found
     """
-    statement = select(Weave).where(Weave.slug == slug).where(Weave.deleted_at.is_(None))
+    statement = (
+        select(Weave).where(Weave.slug == slug).where(col(Weave.deleted_at).is_(None))
+    )
     return session.exec(statement).first()
 
 
-def get_user_weaves(*, session: Session, user_id: UUID, skip: int = 0, limit: int = 100) -> list[Weave]:
+def get_user_weaves(
+    *, session: Session, user_id: UUID, skip: int = 0, limit: int = 100
+) -> list[Weave]:
     """Get all weaves a user has access to.
 
     Args:
@@ -84,14 +90,16 @@ def get_user_weaves(*, session: Session, user_id: UUID, skip: int = 0, limit: in
         .join(WeaveUser)
         .where(WeaveUser.user_id == user_id)
         .where(WeaveUser.status == "active")
-        .where(Weave.deleted_at.is_(None))
+        .where(col(Weave.deleted_at).is_(None))
         .offset(skip)
         .limit(limit)
     )
     return list(session.exec(statement).all())
 
 
-def update_weave(*, session: Session, weave: Weave, weave_update: dict[str, Any]) -> Weave:
+def update_weave(
+    *, session: Session, weave: Weave, weave_update: dict[str, Any]
+) -> Weave:
     """Update a weave.
 
     Args:
@@ -119,12 +127,15 @@ def delete_weave(*, session: Session, weave: Weave) -> None:
         weave: Weave object to delete
     """
     from datetime import datetime
+
     weave.deleted_at = datetime.utcnow()
     session.add(weave)
     session.commit()
 
 
-def get_weave_user(*, session: Session, weave_id: UUID, user_id: UUID) -> WeaveUser | None:
+def get_weave_user(
+    *, session: Session, weave_id: UUID, user_id: UUID
+) -> WeaveUser | None:
     """Get a user's membership in a weave.
 
     Args:
@@ -176,7 +187,9 @@ def add_weave_user(
     return weave_user
 
 
-def update_weave_user_role(*, session: Session, weave_user: WeaveUser, role: str) -> WeaveUser:
+def update_weave_user_role(
+    *, session: Session, weave_user: WeaveUser, role: str
+) -> WeaveUser:
     """Update a user's role in a weave.
 
     Args:

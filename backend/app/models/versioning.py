@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, Field, Index, JSON, SQLModel
+from sqlmodel import JSON, Column, Field, Index, SQLModel
 
 
 class EntryVersion(SQLModel, table=True):
@@ -15,6 +15,7 @@ class EntryVersion(SQLModel, table=True):
 
     Captures the complete state of an entry for version history and rollback.
     """
+
     __tablename__ = "entry_version"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -42,7 +43,7 @@ class EntryVersion(SQLModel, table=True):
     is_major: bool = False  # Major version (significant changes) vs minor
 
     # Auto-generated diff summary
-    changes: dict = Field(default={}, sa_column=Column(JSON))
+    changes: dict[str, list[str]] = Field(default={}, sa_column=Column(JSON))
     # Example: {"fields_changed": ["title", "ruler"], "fields_added": ["population"]}
 
     __table_args__ = (
@@ -57,6 +58,7 @@ class ActivityLog(SQLModel, table=True):
 
     Provides an audit trail and activity timeline.
     """
+
     __tablename__ = "activity_log"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -74,7 +76,7 @@ class ActivityLog(SQLModel, table=True):
     resource_id: UUID
 
     # Context
-    details: dict = Field(default={}, sa_column=Column(JSON))
+    details: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {"entry_title": "Camelot", "fields_changed": ["ruler"], "old_value": "...", "new_value": "..."}
 
     # Related resources
@@ -100,6 +102,7 @@ class SavedView(SQLModel, table=True):
 
     Allows users to save complex queries and filters.
     """
+
     __tablename__ = "saved_view"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -114,7 +117,7 @@ class SavedView(SQLModel, table=True):
     view_type: str = "table"  # 'table', 'gallery', 'timeline', 'map', 'graph'
 
     # Filters and sorting
-    filters: dict = Field(default={}, sa_column=Column(JSON))
+    filters: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {
     #   "entry_type": ["character"],
     #   "tags": ["protagonist"],
@@ -122,7 +125,7 @@ class SavedView(SQLModel, table=True):
     #   "custom_fields": {"alignment": "good"}
     # }
 
-    sort: list[dict] = Field(default=[], sa_column=Column(JSON))
+    sort: list[dict[str, Any]] = Field(default=[], sa_column=Column(JSON))
     # Example: [{"field": "title", "direction": "asc"}]
 
     # Display settings
@@ -130,7 +133,7 @@ class SavedView(SQLModel, table=True):
     # Which fields to show in the view
 
     # Timeline-specific settings (if view_type == 'timeline')
-    timeline_settings: dict = Field(default={}, sa_column=Column(JSON))
+    timeline_settings: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {"group_by": "entry_type", "show_ongoing": true}
 
     # Sharing

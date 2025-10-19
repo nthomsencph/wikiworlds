@@ -6,8 +6,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session
 
-from app.api.deps import get_db
-from app.api.deps_worldbuilding import CurrentUser, CurrentWorld, WorldEditor
+from app.api.deps import CurrentUser, get_db
+from app.api.deps_worldbuilding import CurrentWorld, WorldEditor
 from app.db.crud import block as block_crud
 from app.models.schemas.block import (
     BlockCreate,
@@ -25,7 +25,7 @@ def create_block(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,
+    _: WorldEditor,
     current_user: CurrentUser,
     entry_id: UUID = Query(..., description="Entry ID to create block for"),
     block_in: BlockCreate,
@@ -56,7 +56,7 @@ def bulk_create_blocks(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,
+    _: WorldEditor,
     current_user: CurrentUser,
     entry_id: UUID = Query(..., description="Entry ID to create blocks for"),
     bulk_in: BulkBlocksCreate,
@@ -156,7 +156,7 @@ def update_block(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,
+    _: WorldEditor,
     current_user: CurrentUser,
     block_id: UUID,
     block_in: BlockUpdate,
@@ -195,7 +195,7 @@ def delete_block(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,
+    _: WorldEditor,
     block_id: UUID,
 ) -> None:
     """Delete a block."""

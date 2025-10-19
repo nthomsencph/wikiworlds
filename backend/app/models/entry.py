@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, Field, Index, JSON, SQLModel, UniqueConstraint
+from sqlmodel import JSON, Column, Field, Index, SQLModel, UniqueConstraint
 
 
 class EntryType(SQLModel, table=True):
@@ -47,7 +47,7 @@ class EntryType(SQLModel, table=True):
     title_property: str | None = None  # Which field to use as title
 
     # Settings
-    settings: dict = Field(default={}, sa_column=Column(JSON))
+    settings: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {
     #   "show_on_timeline": true,
     #   "default_icon": "🏰",
@@ -95,7 +95,7 @@ class FieldDefinition(SQLModel, table=True):
     # - json (arbitrary structured data)
 
     # Configuration
-    config: dict = Field(default={}, sa_column=Column(JSON))
+    config: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example configs by type:
     # select: {"options": [{"value": "good", "label": "Good", "color": "green"}]}
     # number: {"min": 0, "max": 100, "step": 1}
@@ -228,7 +228,7 @@ class FieldValue(SQLModel, table=True):
     field_definition_id: UUID = Field(foreign_key="field_definition.id", index=True)
 
     # The actual value (stored as JSON for flexibility)
-    value: dict = Field(sa_column=Column(JSON))
+    value: dict[str, Any] = Field(sa_column=Column(JSON))
     # Value structure depends on field_type:
     # - text: {"text": "Arthur Pendragon"}
     # - number: {"number": 42}

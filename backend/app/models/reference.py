@@ -7,9 +7,10 @@ Example: "Character X ruled Kingdom Y from Year 450-490"
 """
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, Field, Index, JSON, SQLModel, UniqueConstraint
+from sqlmodel import JSON, Column, Field, Index, SQLModel, UniqueConstraint
 
 
 class ReferenceType(SQLModel, table=True):
@@ -22,6 +23,7 @@ class ReferenceType(SQLModel, table=True):
     - "worships" / "worshipped by" (Character -> Deity)
     - "allied with" / "allied with" (symmetric)
     """
+
     __tablename__ = "reference_type"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -59,7 +61,7 @@ class ReferenceType(SQLModel, table=True):
     is_system: bool = False
 
     # Settings
-    settings: dict = Field(default={}, sa_column=Column(JSON))
+    settings: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {
     #   "show_in_sidebar": true,
     #   "group_references": true,
@@ -83,6 +85,7 @@ class Reference(SQLModel, table=True):
 
     Represents directed relationships that can change over time.
     """
+
     __tablename__ = "reference"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -117,7 +120,7 @@ class Reference(SQLModel, table=True):
 
     # Context and custom properties
     context: str | None = None  # Optional note about this relationship
-    properties: dict = Field(default={}, sa_column=Column(JSON))
+    properties: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Can store additional properties like: {"certainty": "confirmed", "source": "Book 3, Chapter 2"}
 
     # Position/ordering (for ordered relationships)
@@ -139,7 +142,12 @@ class Reference(SQLModel, table=True):
         # Composite indexes for common queries
         Index("idx_reference_source_type", "source_entry_id", "reference_type_id"),
         Index("idx_reference_target_type", "target_entry_id", "reference_type_id"),
-        Index("idx_reference_temporal", "source_entry_id", "timeline_start_year", "timeline_end_year"),
+        Index(
+            "idx_reference_temporal",
+            "source_entry_id",
+            "timeline_start_year",
+            "timeline_end_year",
+        ),
     )
 
     def is_valid_at_year(self, year: int) -> bool:
@@ -156,6 +164,7 @@ class Tag(SQLModel, table=True):
 
     Tags are simpler than references - just labels for filtering/grouping.
     """
+
     __tablename__ = "tag"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -188,6 +197,7 @@ class Tag(SQLModel, table=True):
 
 class EntryTag(SQLModel, table=True):
     """Many-to-many relationship between entries and tags."""
+
     __tablename__ = "entry_tag"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)

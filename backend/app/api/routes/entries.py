@@ -9,6 +9,7 @@ from sqlmodel import Session, col, select
 from app.api.deps import CurrentUser, get_db
 from app.api.deps_worldbuilding import CurrentWorld, WorldEditor
 from app.db.crud import entry as entry_crud
+from app.db.crud import tag as tag_crud
 from app.models.base import Message
 from app.models.entry import EntryType
 from app.models.schemas.entry import (
@@ -17,7 +18,6 @@ from app.models.schemas.entry import (
     EntryCreate,
     EntryMove,
     EntryPublic,
-    EntryTree,
     EntryWithFields,
     FieldValueCreate,
     FieldValuePublic,
@@ -36,7 +36,7 @@ def create_entry(
     session: Annotated[Session, Depends(get_db)],
     current_user: CurrentUser,
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can create entries
+    _: WorldEditor,  # Only editors can create entries
     entry_in: EntryCreate,
 ) -> EntryPublic:
     """Create a new Entry in a World."""
@@ -55,14 +55,54 @@ def create_entry(
 
     entry = entry_crud.create_entry(
         session=session,
-        entry_create=entry_in.model_dump(exclude={"entry_type_id", "parent_id"}),
+        entry_create=entry_in.model_dump(
+            exclude={"entry_type_id", "parent_id", "tags"}
+        ),
         world_id=world.id,
         entry_type_id=entry_in.entry_type_id,
         user_id=current_user.id,
         parent_id=entry_in.parent_id,
     )
 
-    return EntryPublic(**entry.model_dump())
+    # Handle tags
+    if entry_in.tags:
+        from app.models.reference import EntryTag
+
+        for tag_name in entry_in.tags:
+            tag_name = tag_name.strip()
+            if not tag_name:
+                continue
+
+            # Generate slug from tag name
+            tag_slug = tag_name.lower().replace(" ", "-").replace("_", "-")
+
+            # Check if tag already exists
+            tag = tag_crud.get_tag_by_slug(
+                session=session, world_id=world.id, slug=tag_slug
+            )
+
+            # Create tag if it doesn't exist
+            if not tag:
+                tag = tag_crud.create_tag(
+                    session=session,
+                    tag_create={"name": tag_name, "slug": tag_slug},
+                    world_id=world.id,
+                    user_id=current_user.id,
+                )
+
+            # Link tag to entry
+            entry_tag = EntryTag(
+                entry_id=entry.id, tag_id=tag.id, created_by=current_user.id
+            )
+            session.add(entry_tag)
+
+        session.commit()
+
+    # Get tags for response
+    tags = tag_crud.get_entry_tags(session=session, entry_id=entry.id)
+    tag_names = [tag.name for tag in tags]
+
+    return EntryPublic(**entry.model_dump(), tags=tag_names)
 
 
 @router.get("/", response_model=EntriesPublic)
@@ -108,12 +148,19 @@ def list_entries(
             session=session, entry_ids=entry_ids
         )
 
+    # Get tags for each entry
+    tags_map = {}
+    if entries:
+        entry_ids = {entry.id for entry in entries}
+        tags_map = tag_crud.get_entries_tags_map(session=session, entry_ids=entry_ids)
+
     return EntriesPublic(
         data=[
             EntryPublic(
                 **entry.model_dump(),
                 entry_type_name=entry_type_map.get(entry.entry_type_id),
                 character_count=character_count_map.get(entry.id, 0),
+                tags=tags_map.get(entry.id, []),
             )
             for entry in entries
         ],
@@ -179,7 +226,7 @@ def update_entry(
     session: Annotated[Session, Depends(get_db)],
     current_user: CurrentUser,
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can update entries
+    _: WorldEditor,  # Only editors can update entries
     entry_id: UUID,
     entry_in: EntryCreate,
 ) -> EntryPublic:
@@ -207,7 +254,7 @@ def move_entry(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can move entries
+    _: WorldEditor,  # Only editors can move entries
     entry_id: UUID,
     move_in: EntryMove,
 ) -> EntryPublic:
@@ -240,7 +287,7 @@ def delete_entry(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can delete entries
+    _: WorldEditor,  # Only editors can delete entries
     entry_id: UUID,
     recursive: bool = Query(False, description="Also delete all descendants"),
 ) -> Message:
@@ -361,7 +408,7 @@ def set_field_value(
     session: Annotated[Session, Depends(get_db)],
     current_user: CurrentUser,
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can set field values
+    _: WorldEditor,  # Only editors can set field values
     entry_id: UUID,
     field_value_in: FieldValueCreate,
 ) -> FieldValuePublic:
@@ -399,7 +446,7 @@ def set_field_values_bulk(
     session: Annotated[Session, Depends(get_db)],
     current_user: CurrentUser,
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can set field values
+    _: WorldEditor,  # Only editors can set field values
     entry_id: UUID,
     bulk_in: BulkFieldValues,
 ) -> FieldValuesPublic:
@@ -434,7 +481,8 @@ def set_field_values_bulk(
 
 
 @router.get(
-    "/{entry_id}/fields/{field_definition_id}/history", response_model=FieldValuesPublic
+    "/{entry_id}/fields/{field_definition_id}/history",
+    response_model=FieldValuesPublic,
 )
 def get_field_value_history(
     *,
@@ -469,7 +517,7 @@ def delete_field_value(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can delete field values
+    _: WorldEditor,  # Only editors can delete field values
     entry_id: UUID,
     field_value_id: UUID,
 ) -> Message:

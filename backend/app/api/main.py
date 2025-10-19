@@ -7,6 +7,7 @@ from app.api.routes import (
     items,
     login,
     private,
+    tags,
     users,
     utils,
     weaves,
@@ -45,6 +46,11 @@ api_router.include_router(
     blocks.router,
     prefix="/weaves/{weave_id}/worlds/{world_id}/blocks",
     tags=["blocks"],
+)
+api_router.include_router(
+    tags.router,
+    prefix="/weaves/{weave_id}/worlds/{world_id}/tags",
+    tags=["tags"],
 )
 
 if settings.ENVIRONMENT == "local":

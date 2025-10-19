@@ -34,7 +34,7 @@ def create_entry_type(
     session: Annotated[Session, Depends(get_db)],
     current_user: CurrentUser,
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can create types
+    _: WorldEditor,  # Only editors can create types
     entry_type_in: EntryTypeCreate,
 ) -> EntryTypePublic:
     """Create a new EntryType in a World."""
@@ -109,7 +109,7 @@ def update_entry_type(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can update types
+    _: WorldEditor,  # Only editors can update types
     entry_type_id: UUID,
     entry_type_in: EntryTypeUpdate,
 ) -> EntryTypePublic:
@@ -122,13 +122,6 @@ def update_entry_type(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Entry type not found",
-        )
-
-    # Don't allow updating system types
-    if entry_type.is_system:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cannot modify system entry types",
         )
 
     updated_entry_type = entry_type_crud.update_entry_type(
@@ -145,7 +138,7 @@ def delete_entry_type(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can delete types
+    _: WorldEditor,  # Only editors can delete types
     entry_type_id: UUID,
 ) -> Message:
     """Delete an EntryType (soft delete).
@@ -160,13 +153,6 @@ def delete_entry_type(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Entry type not found",
-        )
-
-    # Don't allow deleting system types
-    if entry_type.is_system:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cannot delete system entry types",
         )
 
     entry_type_crud.delete_entry_type(session=session, entry_type=entry_type)
@@ -215,7 +201,7 @@ def create_field(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can create fields
+    _: WorldEditor,  # Only editors can create fields
     entry_type_id: UUID,
     field_in: FieldDefinitionCreate,
 ) -> FieldDefinitionPublic:
@@ -228,13 +214,6 @@ def create_field(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Entry type not found",
-        )
-
-    # Don't allow modifying system types
-    if entry_type.is_system:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cannot modify system entry types",
         )
 
     field = entry_type_crud.create_field_definition(
@@ -252,8 +231,8 @@ def create_field(
 def update_field(
     *,
     session: Annotated[Session, Depends(get_db)],
-    world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can update fields
+    world: CurrentWorld,  # noqa # type: ignore
+    _: WorldEditor,  # Only editors can update fields
     entry_type_id: UUID,
     field_id: UUID,
     field_in: FieldDefinitionUpdate,
@@ -282,8 +261,8 @@ def update_field(
 def delete_field(
     *,
     session: Annotated[Session, Depends(get_db)],
-    world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can delete fields
+    world: CurrentWorld,  # noqa # type: ignore
+    _: WorldEditor,  # Only editors can delete fields
     entry_type_id: UUID,
     field_id: UUID,
 ) -> Message:
@@ -311,7 +290,7 @@ def reorder_fields(
     *,
     session: Annotated[Session, Depends(get_db)],
     world: CurrentWorld,
-    world_editor: WorldEditor,  # Only editors can reorder fields
+    _: WorldEditor,  # Only editors can reorder fields
     entry_type_id: UUID,
     reorder_in: FieldReorderRequest,
 ) -> FieldDefinitionsPublic:

@@ -1,9 +1,10 @@
 """Weave (tenant) and World models."""
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, Field, Index, JSON, SQLModel, UniqueConstraint
+from sqlmodel import JSON, Column, Field, Index, SQLModel, UniqueConstraint
 
 
 class Weave(SQLModel, table=True):
@@ -31,7 +32,7 @@ class Weave(SQLModel, table=True):
     subscription_status: str = "active"  # 'active', 'trialing', 'past_due', 'canceled'
 
     # Settings
-    settings: dict = Field(default={}, sa_column=Column(JSON))
+    settings: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example settings: {"default_permissions": {...}, "sso_enabled": false, ...}
 
     # Ownership
@@ -69,7 +70,7 @@ class WeaveUser(SQLModel, table=True):
     joined_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Custom permissions (overrides)
-    custom_permissions: dict = Field(default={}, sa_column=Column(JSON))
+    custom_permissions: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
 
     __table_args__ = (
         UniqueConstraint("weave_id", "user_id"),
@@ -107,7 +108,7 @@ class World(SQLModel, table=True):
     is_template: bool = False  # Template worlds can be copied by others
 
     # Settings
-    settings: dict = Field(default={}, sa_column=Column(JSON))
+    settings: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example: {
     #   "enable_timeline": true,
     #   "enable_map": true,
@@ -158,7 +159,7 @@ class WorldUser(SQLModel, table=True):
     joined_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Custom permissions
-    custom_permissions: dict = Field(default={}, sa_column=Column(JSON))
+    custom_permissions: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
 
     __table_args__ = (
         UniqueConstraint("world_id", "user_id"),

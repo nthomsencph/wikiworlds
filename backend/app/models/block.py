@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Column, Field, Index, JSON, SQLModel
+from sqlmodel import JSON, Column, Field, Index, SQLModel
 
 
 class Block(SQLModel, table=True):
@@ -47,7 +47,7 @@ class Block(SQLModel, table=True):
     # - divider, table_of_contents
 
     # Content structure (varies by block_type)
-    content: dict = Field(default={}, sa_column=Column(JSON))
+    content: dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     # Example content structures:
     # paragraph: {"text": [{"text": "Hello", "bold": true}, ...], "color": "default"}
     # heading1: {"text": "Chapter Title", "toggleable": false}
@@ -132,7 +132,7 @@ class BlockVersion(SQLModel, table=True):
 
     # Snapshot of block state
     block_type: str
-    content: dict = Field(sa_column=Column(JSON))
+    content: dict[str, Any] = Field(sa_column=Column(JSON))
     position: float
 
     # Temporal snapshot
@@ -177,7 +177,7 @@ class Comment(SQLModel, table=True):
     resolved_at: datetime | None = None
 
     # Reactions (emoji reactions to comments)
-    reactions: dict = Field(default={}, sa_column=Column(JSON))
+    reactions: dict[str, list[UUID]] = Field(default={}, sa_column=Column(JSON))
     # Example: {"👍": ["user_uuid1", "user_uuid2"], "❤️": ["user_uuid3"]}
 
     # Metadata

@@ -135,6 +135,7 @@ export type EntryCreate = {
     timeline_is_circa?: boolean;
     timeline_is_ongoing?: boolean;
     timeline_display_override?: (string | null);
+    tags?: Array<(string)>;
 };
 
 /**
@@ -175,6 +176,7 @@ export type EntryPublic = {
     parent_id?: (string | null);
     children_count?: (number | null);
     character_count?: (number | null);
+    tags?: Array<(string)>;
 };
 
 /**
@@ -259,6 +261,7 @@ export type EntryWithFields = {
     parent_id?: (string | null);
     children_count?: (number | null);
     character_count?: (number | null);
+    tags?: Array<(string)>;
     field_values?: {
         [key: string]: unknown;
     };
@@ -433,6 +436,52 @@ export type PrivateUserCreate = {
     password: string;
     full_name: string;
     is_verified?: boolean;
+};
+
+/**
+ * Schema for creating a new Tag.
+ */
+export type TagCreate = {
+    name: string;
+    slug: string;
+    color?: string;
+    icon?: (string | null);
+    description?: (string | null);
+    tag_group?: (string | null);
+};
+
+/**
+ * Public schema for Tag responses.
+ */
+export type TagPublic = {
+    name: string;
+    slug: string;
+    color?: string;
+    icon?: (string | null);
+    description?: (string | null);
+    tag_group?: (string | null);
+    id: string;
+    world_id: string;
+    created_at: string;
+};
+
+/**
+ * Schema for paginated list of Tags.
+ */
+export type TagsPublic = {
+    data: Array<TagPublic>;
+    count: number;
+};
+
+/**
+ * Schema for updating a Tag.
+ */
+export type TagUpdate = {
+    name?: (string | null);
+    color?: (string | null);
+    icon?: (string | null);
+    description?: (string | null);
+    tag_group?: (string | null);
 };
 
 export type Token = {
@@ -1009,6 +1058,48 @@ export type PrivateCreateUserData = {
 };
 
 export type PrivateCreateUserResponse = (UserPublic);
+
+export type TagsCreateTagData = {
+    requestBody: TagCreate;
+    weaveId: string;
+    worldId: string;
+};
+
+export type TagsCreateTagResponse = (TagPublic);
+
+export type TagsListTagsData = {
+    limit?: number;
+    skip?: number;
+    weaveId: string;
+    worldId: string;
+};
+
+export type TagsListTagsResponse = (TagsPublic);
+
+export type TagsGetTagData = {
+    tagId: string;
+    weaveId: string;
+    worldId: string;
+};
+
+export type TagsGetTagResponse = (TagPublic);
+
+export type TagsUpdateTagData = {
+    requestBody: TagUpdate;
+    tagId: string;
+    weaveId: string;
+    worldId: string;
+};
+
+export type TagsUpdateTagResponse = (TagPublic);
+
+export type TagsDeleteTagData = {
+    tagId: string;
+    weaveId: string;
+    worldId: string;
+};
+
+export type TagsDeleteTagResponse = (Message);
 
 export type UsersReadUsersData = {
     limit?: number;

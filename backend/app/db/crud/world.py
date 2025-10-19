@@ -3,12 +3,12 @@
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
-from app.models.weave import World, WorldUser
-from app.models.timeline import WorldTimeline
-from app.models.entry import EntryType
 from app.db.crud.constants import DEFAULT_ENTRY_TYPES
+from app.models.entry import EntryType
+from app.models.timeline import WorldTimeline
+from app.models.weave import World, WorldUser
 
 
 def create_world(
@@ -61,6 +61,8 @@ def create_world(
     for entry_type_data in DEFAULT_ENTRY_TYPES:
         if entry_type_data.get("parent_name") is None:
             # This is a top-level entry type
+            assert entry_type_data["name"] is not None
+
             slug = entry_type_data["name"].lower().replace(" ", "-")
 
             # Remove parent_name from data before creating
@@ -82,6 +84,8 @@ def create_world(
         parent_name = entry_type_data.get("parent_name")
         if parent_name is not None:
             # This is a child entry type
+            assert entry_type_data["name"] is not None
+
             slug = entry_type_data["name"].lower().replace(" ", "-")
 
             # Get parent ID from map
@@ -139,7 +143,7 @@ def get_world_by_slug(*, session: Session, weave_id: UUID, slug: str) -> World |
         select(World)
         .where(World.weave_id == weave_id)
         .where(World.slug == slug)
-        .where(World.deleted_at.is_(None))
+        .where(col(World.deleted_at).is_(None))
     )
     return session.exec(statement).first()
 
@@ -165,7 +169,7 @@ def get_weave_worlds(
     statement = (
         select(World)
         .where(World.weave_id == weave_id)
-        .where(World.deleted_at.is_(None))
+        .where(col(World.deleted_at).is_(None))
         .offset(skip)
         .limit(limit)
     )
@@ -197,7 +201,7 @@ def get_user_worlds(
         .join(WorldUser)
         .where(WorldUser.user_id == user_id)
         .where(WorldUser.status == "active")
-        .where(World.deleted_at.is_(None))
+        .where(col(World.deleted_at).is_(None))
     )
 
     if weave_id:
@@ -223,7 +227,7 @@ def get_public_worlds(
     statement = (
         select(World)
         .where(World.is_public == True)  # noqa: E712
-        .where(World.deleted_at.is_(None))
+        .where(col(World.deleted_at).is_(None))
         .offset(skip)
         .limit(limit)
     )

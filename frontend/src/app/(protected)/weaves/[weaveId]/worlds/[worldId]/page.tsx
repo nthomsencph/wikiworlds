@@ -6,34 +6,36 @@ import {
   Flex,
   Heading,
   Text,
-  Badge,
-  TreeView,
   createTreeCollection,
+  useFilter,
+  createListCollection,
 } from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useParams, useRouter } from "next/navigation"
-import { useState, useMemo } from "react"
-import {
-  FiPlus,
-  FiCalendar,
-  FiFilter,
-  FiHome,
-  FiSearch,
-  FiShare2,
-  FiFile,
-} from "react-icons/fi"
-import { LuNetwork, LuFolder, LuFile as LuFileIcon } from "react-icons/lu"
+import { useState, useMemo, useEffect } from "react"
+import { FiPlus, FiCalendar, FiHome, FiSearch, FiShare2 } from "react-icons/fi"
+import { LuNetwork } from "react-icons/lu"
 
 import {
-  Weaves as WeavesAPI,
   Worlds as WorldsAPI,
   Entries as EntriesAPI,
   EntryTypes as EntryTypesAPI,
+  Tags as TagsAPI,
 } from "@/client"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { toaster } from "@/components/ui/toaster"
 import Dock, { DockItemData } from "@/components/Dock"
-import Masonry from "@/components/Masonry"
+import {
+  WorldTreeView,
+  DashboardView,
+  TimelineView,
+  SearchView,
+  KnowledgeGraphView,
+  DeleteEntryDialog,
+  RenameEntryTypeDialog,
+  CreateNestedEntryTypeDialog,
+  DeleteEntryTypeDialog,
+  type TreeNode,
+} from "@/components/World"
 
 const PER_PAGE = 25
 
@@ -49,9 +51,44 @@ export default function WorldDetail() {
   const [currentView, setCurrentView] = useState<
     "dashboard" | "tree" | "timeline" | "search" | "knowledge-graph"
   >("dashboard")
-  const [treeViewMode, setTreeViewMode] = useState<"hierarchy" | "entry-type">(
-    "hierarchy"
-  )
+  const [expandedNodes, setExpandedNodes] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [tagSearchValue, setTagSearchValue] = useState("")
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [entryToDelete, setEntryToDelete] = useState<{
+    id: string
+    name: string
+  } | null>(null)
+
+  // Rename entry type dialog state
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [entryTypeToRename, setEntryTypeToRename] = useState<{
+    id: string
+    name: string
+  } | null>(null)
+  const [newEntryTypeName, setNewEntryTypeName] = useState("")
+
+  // Create nested entry type dialog state
+  const [createNestedDialogOpen, setCreateNestedDialogOpen] = useState(false)
+  const [parentEntryType, setParentEntryType] = useState<{
+    id: string
+    name: string
+  } | null>(null)
+  const [nestedEntryTypeName, setNestedEntryTypeName] = useState("")
+
+  // Delete entry type dialog state
+  const [deleteEntryTypeDialogOpen, setDeleteEntryTypeDialogOpen] =
+    useState(false)
+  const [entryTypeToDelete, setEntryTypeToDelete] = useState<{
+    id: string
+    name: string
+  } | null>(null)
+
+  const { contains } = useFilter({ sensitivity: "base" })
+  const queryClient = useQueryClient()
 
   const { data: world, isLoading: worldLoading } = useQuery({
     queryFn: () => WorldsAPI.getWorld({ weaveId, worldId }),
@@ -61,6 +98,11 @@ export default function WorldDetail() {
   const { data: entryTypesData } = useQuery({
     queryFn: () => EntryTypesAPI.listEntryTypes({ weaveId, worldId }),
     queryKey: ["entryTypes", weaveId, worldId],
+  })
+
+  const { data: tagsData } = useQuery({
+    queryFn: () => TagsAPI.listTags({ weaveId, worldId }),
+    queryKey: ["tags", weaveId, worldId],
   })
 
   const { data: entriesData, isLoading: entriesLoading } = useQuery({
@@ -98,6 +140,252 @@ export default function WorldDetail() {
   const entries = entriesData?.data ?? []
   const count = entriesData?.count ?? 0
   const allEntries = allEntriesData?.data ?? []
+  const tags = tagsData?.data ?? []
+
+  // Delete entry mutation
+  const deleteMutation = useMutation({
+    mutationFn: (entryId: string) =>
+      EntriesAPI.deleteEntry({ weaveId, worldId, entryId }),
+    onSuccess: () => {
+      toaster.create({
+        title: "Entry deleted",
+        description: `"${entryToDelete?.name}" has been deleted successfully.`,
+        type: "success",
+      })
+      queryClient.invalidateQueries({ queryKey: ["entries", weaveId, worldId] })
+      queryClient.invalidateQueries({
+        queryKey: ["allEntries", weaveId, worldId],
+      })
+      setDeleteDialogOpen(false)
+      setEntryToDelete(null)
+    },
+    onError: (error: any) => {
+      toaster.create({
+        title: "Failed to delete entry",
+        description:
+          error.message || "An error occurred while deleting the entry.",
+        type: "error",
+      })
+    },
+  })
+
+  // Handle delete entry
+  const handleDeleteEntry = (entryId: string, entryName: string) => {
+    setEntryToDelete({ id: entryId, name: entryName })
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (entryToDelete) {
+      deleteMutation.mutate(entryToDelete.id)
+    }
+  }
+
+  // Rename entry type mutation
+  const renameMutation = useMutation({
+    mutationFn: ({
+      entryTypeId,
+      newName,
+    }: {
+      entryTypeId: string
+      newName: string
+    }) =>
+      EntryTypesAPI.updateEntryType({
+        weaveId,
+        worldId,
+        entryTypeId,
+        requestBody: { name: newName },
+      }),
+    onSuccess: () => {
+      toaster.create({
+        title: "Entry type renamed",
+        description: `Entry type renamed to "${newEntryTypeName}" successfully.`,
+        type: "success",
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["entryTypes", weaveId, worldId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["allEntries", weaveId, worldId],
+      })
+      setRenameDialogOpen(false)
+      setEntryTypeToRename(null)
+      setNewEntryTypeName("")
+    },
+    onError: (error: any) => {
+      toaster.create({
+        title: "Failed to rename entry type",
+        description:
+          error.message || "An error occurred while renaming the entry type.",
+        type: "error",
+      })
+    },
+  })
+
+  // Handle rename entry type
+  const handleRenameEntryType = (
+    entryTypeId: string,
+    entryTypeName: string
+  ) => {
+    setEntryTypeToRename({ id: entryTypeId, name: entryTypeName })
+    setNewEntryTypeName(entryTypeName)
+    setRenameDialogOpen(true)
+  }
+
+  const confirmRename = () => {
+    if (entryTypeToRename && newEntryTypeName.trim()) {
+      renameMutation.mutate({
+        entryTypeId: entryTypeToRename.id,
+        newName: newEntryTypeName.trim(),
+      })
+    }
+  }
+
+  // Create nested entry type mutation
+  const createNestedMutation = useMutation({
+    mutationFn: ({ parentId, name }: { parentId: string; name: string }) => {
+      // Generate slug from name (lowercase, replace spaces with hyphens)
+      const slug = name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+
+      return EntryTypesAPI.createEntryType({
+        weaveId,
+        worldId,
+        requestBody: {
+          name,
+          slug,
+          parent_id: parentId,
+        },
+      })
+    },
+    onSuccess: () => {
+      toaster.create({
+        title: "Entry type created",
+        description: `Nested entry type "${nestedEntryTypeName}" created successfully.`,
+        type: "success",
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["entryTypes", weaveId, worldId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["allEntries", weaveId, worldId],
+      })
+      setCreateNestedDialogOpen(false)
+      setParentEntryType(null)
+      setNestedEntryTypeName("")
+    },
+    onError: (error: any) => {
+      toaster.create({
+        title: "Failed to create entry type",
+        description:
+          error.message || "An error occurred while creating the entry type.",
+        type: "error",
+      })
+    },
+  })
+
+  // Handle create nested entry type
+  const handleCreateNestedEntryType = (
+    entryTypeId: string,
+    entryTypeName: string
+  ) => {
+    setParentEntryType({ id: entryTypeId, name: entryTypeName })
+    setNestedEntryTypeName("")
+    setCreateNestedDialogOpen(true)
+  }
+
+  const confirmCreateNested = () => {
+    if (parentEntryType && nestedEntryTypeName.trim()) {
+      createNestedMutation.mutate({
+        parentId: parentEntryType.id,
+        name: nestedEntryTypeName.trim(),
+      })
+    }
+  }
+
+  // Delete entry type mutation
+  const deleteEntryTypeMutation = useMutation({
+    mutationFn: (entryTypeId: string) =>
+      EntryTypesAPI.deleteEntryType({ weaveId, worldId, entryTypeId }),
+    onSuccess: () => {
+      toaster.create({
+        title: "Entry type deleted",
+        description: `"${entryTypeToDelete?.name}" has been deleted successfully.`,
+        type: "success",
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["entryTypes", weaveId, worldId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["allEntries", weaveId, worldId],
+      })
+      setDeleteEntryTypeDialogOpen(false)
+      setEntryTypeToDelete(null)
+    },
+    onError: (error: any) => {
+      toaster.create({
+        title: "Failed to delete entry type",
+        description:
+          error.message || "An error occurred while deleting the entry type.",
+        type: "error",
+      })
+    },
+  })
+
+  // Check if an entry type has any entries (direct or in nested children)
+  const entryTypeHasEntries = (entryTypeId: string): boolean => {
+    // Get all entry type IDs including children recursively
+    const getAllChildEntryTypeIds = (typeId: string): string[] => {
+      const childIds: string[] = [typeId]
+      const childTypes = entryTypes.filter((et) => et.parent_id === typeId)
+
+      childTypes.forEach((child) => {
+        childIds.push(...getAllChildEntryTypeIds(child.id))
+      })
+
+      return childIds
+    }
+
+    const allTypeIds = getAllChildEntryTypeIds(entryTypeId)
+
+    // Check if any entries exist for this type or its children
+    return allEntries.some((entry) => allTypeIds.includes(entry.entry_type_id))
+  }
+
+  // Handle delete entry type
+  const handleDeleteEntryType = (
+    entryTypeId: string,
+    entryTypeName: string
+  ) => {
+    setEntryTypeToDelete({ id: entryTypeId, name: entryTypeName })
+    setDeleteEntryTypeDialogOpen(true)
+  }
+
+  const confirmDeleteEntryType = () => {
+    if (entryTypeToDelete && !entryTypeHasEntries(entryTypeToDelete.id)) {
+      deleteEntryTypeMutation.mutate(entryTypeToDelete.id)
+    }
+  }
+
+  // Get all unique tag names from tags data
+  const allTagNames = useMemo(() => tags.map((tag) => tag.name), [tags])
+
+  // Filter tags for combobox based on search
+  const filteredTags = useMemo(
+    () =>
+      allTagNames.filter((tag) =>
+        tag.toLowerCase().includes(tagSearchValue.toLowerCase())
+      ),
+    [allTagNames, tagSearchValue]
+  )
+
+  // Create combobox collection
+  const tagCollection = useMemo(
+    () => createListCollection({ items: filteredTags }),
+    [filteredTags]
+  )
 
   // Transform entries into Masonry items
   const masonryItems = useMemo(() => {
@@ -113,18 +401,12 @@ export default function WorldDetail() {
   }, [entries, weaveId, worldId])
 
   // Build hierarchical tree structure for tree view
-  interface TreeNode {
-    id: string
-    name: string
-    icon?: string | null
-    entryTypeName?: string | null
-    children?: TreeNode[]
-    childrenCount?: number
-    isEntryTypeFolder?: boolean
-  }
-
   const treeCollection = useMemo(() => {
-    if (allEntries.length === 0) {
+    // Build hierarchical tree based on entry types
+    const entryTypes = entryTypesData?.data || []
+
+    // If no entry types exist, show empty tree
+    if (entryTypes.length === 0) {
       return createTreeCollection<TreeNode>({
         nodeToValue: (node) => node.id,
         nodeToString: (node) => node.name,
@@ -136,176 +418,111 @@ export default function WorldDetail() {
       })
     }
 
-    if (treeViewMode === "entry-type") {
-      // Build hierarchical tree based on entry types using iterative approach
-      const entryTypes = entryTypesData?.data || []
-
-      // Group entries by entry type ID
-      const entriesByType = new Map<string, typeof allEntries>()
-      allEntries.forEach((entry) => {
-        const typeId = entry.entry_type_id
-        if (!entriesByType.has(typeId)) {
-          entriesByType.set(typeId, [])
-        }
-        entriesByType.get(typeId)!.push(entry)
-      })
-
-      // Create a map of entry type nodes
-      const typeNodesMap = new Map<string, TreeNode>()
-
-      // Create nodes for all entry types that have entries
-      entryTypes.forEach((type) => {
-        const entries = entriesByType.get(type.id) || []
-
-        // Convert entries to tree nodes
-        const entryNodes: TreeNode[] = entries
-          .sort((a, b) => a.title.localeCompare(b.title))
-          .map((entry) => ({
-            id: entry.id,
-            name: entry.title,
-            icon: entry.icon,
-            entryTypeName: null,
-            children: undefined,
-            isEntryTypeFolder: false,
-          }))
-
-        // Create the type node (even if it has no entries yet, it might have children)
-        typeNodesMap.set(type.id, {
-          id: `type-${type.id}`,
-          name: type.name,
-          icon: null,
-          entryTypeName: null,
-          children: entryNodes,
-          childrenCount: entryNodes.length,
-          isEntryTypeFolder: true,
-          _parentId: type.parent_id, // Temporary field for building hierarchy
-        } as TreeNode & { _parentId: string | null })
-      })
-
-      // Build parent-child relationships iteratively
-      const rootNodes: TreeNode[] = []
-
-      // First pass: Build parent-child relationships
-      typeNodesMap.forEach((node, typeId) => {
-        const typedNode = node as TreeNode & { _parentId: string | null }
-        const parentId = typedNode._parentId
-
-        // Check for circular reference
-        if (parentId && parentId === typeId) {
-          console.warn(
-            `Self-reference detected in entry type: ${node.name} (${typeId})`
-          )
-          return
-        }
-
-        if (parentId !== null) {
-          // Child type - add to parent's children
-          const parentNode = typeNodesMap.get(parentId) as
-            | (TreeNode & { _parentId: string | null })
-            | undefined
-          if (parentNode) {
-            if (!parentNode.children) {
-              parentNode.children = []
-            }
-            parentNode.children.unshift(typedNode) // Add child types before entries
-          } else {
-            // Parent not found, will be handled as potential root
-            console.warn(
-              `Parent entry type not found for: ${node.name} (parent_id: ${parentId})`
+    // Filter entries by selected tags
+    const filteredEntries =
+      selectedTags.length === 0
+        ? allEntries // Show all if no tags selected
+        : allEntries.filter((entry) => {
+            // Show entry only if it has ALL selected tags (AND logic)
+            return (
+              entry.tags &&
+              selectedTags.every((tag) => entry.tags!.includes(tag))
             )
-          }
-        }
-      })
+          })
 
-      // Helper function to recursively filter out empty entry type nodes
-      const filterEmptyEntryTypes = (node: TreeNode): TreeNode | null => {
-        if (!node.children || node.children.length === 0) {
-          // Node has no children at all
-          return null
-        }
-
-        // Process all children recursively
-        const filteredChildren: TreeNode[] = []
-
-        for (const child of node.children) {
-          if (child.isEntryTypeFolder) {
-            // This is an entry type folder - recursively filter it
-            const filteredChild = filterEmptyEntryTypes(child)
-            if (filteredChild) {
-              filteredChildren.push(filteredChild)
-            }
-          } else {
-            // This is an actual entry - keep it
-            filteredChildren.push(child)
-          }
-        }
-
-        // If no children remain after filtering, return null
-        if (filteredChildren.length === 0) {
-          return null
-        }
-
-        // Return the node with filtered children
-        return {
-          ...node,
-          children: filteredChildren,
-          childrenCount: filteredChildren.length,
-        }
+    // Group entries by entry type ID
+    const entriesByType = new Map<string, typeof allEntries>()
+    filteredEntries.forEach((entry) => {
+      const typeId = entry.entry_type_id
+      if (!entriesByType.has(typeId)) {
+        entriesByType.set(typeId, [])
       }
+      entriesByType.get(typeId)!.push(entry)
+    })
 
-      // Second pass: Build root nodes and filter out empty entry types
-      typeNodesMap.forEach((node, typeId) => {
-        const typedNode = node as TreeNode & { _parentId: string | null }
-        const parentId = typedNode._parentId
+    // Create a map of entry type nodes
+    const typeNodesMap = new Map<string, TreeNode>()
 
-        // Only process root-level types or types whose parent wasn't found
-        if (parentId === null || !typeNodesMap.has(parentId)) {
-          // Filter this node and its descendants
-          const filteredNode = filterEmptyEntryTypes(typedNode)
-          if (filteredNode) {
-            delete (filteredNode as any)._parentId
-            rootNodes.push(filteredNode)
-          }
-        }
-      })
+    // Create nodes for ALL entry types (even if they have no entries)
+    entryTypes.forEach((type) => {
+      const entries = entriesByType.get(type.id) || []
 
-      // Clean up any remaining _parentId fields
-      typeNodesMap.forEach((node) => {
-        delete (node as any)._parentId
-      })
-
-      return createTreeCollection<TreeNode>({
-        nodeToValue: (node) => node.id,
-        nodeToString: (node) => node.name,
-        rootNode: {
-          id: "ROOT",
-          name: "",
-          children: rootNodes,
-        },
-      })
-    }
-
-    // Default: hierarchical view by parent-child relationships
-    // Build a map of entries by id
-    const entryMap = new Map(allEntries.map((entry) => [entry.id, entry]))
-
-    // Build tree structure
-    const buildTree = (parentId: string | null = null): TreeNode[] => {
-      return allEntries
-        .filter((entry) => entry.parent_id === parentId)
-        .sort((a, b) => a.position - b.position)
+      // Convert entries to tree nodes
+      const entryNodes: TreeNode[] = entries
+        .sort((a, b) => a.title.localeCompare(b.title))
         .map((entry) => ({
           id: entry.id,
           name: entry.title,
           icon: entry.icon,
-          entryTypeName: entry.entry_type_name,
-          childrenCount: entry.children_count ?? 0,
-          children: entry.children_count ? buildTree(entry.id) : undefined,
+          entryTypeName: null,
+          children: undefined,
           isEntryTypeFolder: false,
         }))
-    }
 
-    const rootNodes = buildTree(null)
+      // Create the type node (always create it, even with no entries)
+      typeNodesMap.set(type.id, {
+        id: `type-${type.id}`,
+        name: type.name,
+        icon: null,
+        entryTypeName: null,
+        children: entryNodes.length > 0 ? entryNodes : undefined,
+        childrenCount: entryNodes.length,
+        isEntryTypeFolder: true,
+        _parentId: type.parent_id, // Temporary field for building hierarchy
+      } as TreeNode & { _parentId: string | null })
+    })
+
+    // Build parent-child relationships iteratively
+    const rootNodes: TreeNode[] = []
+
+    // First pass: Build parent-child relationships
+    typeNodesMap.forEach((node, typeId) => {
+      const typedNode = node as TreeNode & { _parentId: string | null }
+      const parentId = typedNode._parentId
+
+      // Check for circular reference
+      if (parentId && parentId === typeId) {
+        console.warn(
+          `Self-reference detected in entry type: ${node.name} (${typeId})`
+        )
+        return
+      }
+
+      if (parentId !== null) {
+        // Child type - add to parent's children
+        const parentNode = typeNodesMap.get(parentId) as
+          | (TreeNode & { _parentId: string | null })
+          | undefined
+        if (parentNode) {
+          if (!parentNode.children) {
+            parentNode.children = []
+          }
+          parentNode.children.unshift(typedNode) // Add child types before entries
+        } else {
+          // Parent not found, will be handled as potential root
+          console.warn(
+            `Parent entry type not found for: ${node.name} (parent_id: ${parentId})`
+          )
+        }
+      }
+    })
+
+    // Second pass: Build root nodes (keep ALL entry types, even empty ones)
+    typeNodesMap.forEach((node, typeId) => {
+      const typedNode = node as TreeNode & { _parentId: string | null }
+      const parentId = typedNode._parentId
+
+      // Only process root-level types or types whose parent wasn't found
+      if (parentId === null || !typeNodesMap.has(parentId)) {
+        delete (typedNode as any)._parentId
+        rootNodes.push(typedNode)
+      }
+    })
+
+    // Clean up any remaining _parentId fields
+    typeNodesMap.forEach((node) => {
+      delete (node as any)._parentId
+    })
 
     return createTreeCollection<TreeNode>({
       nodeToValue: (node) => node.id,
@@ -316,10 +533,69 @@ export default function WorldDetail() {
         children: rootNodes,
       },
     })
-  }, [allEntries, treeViewMode, entryTypesData])
+  }, [allEntries, entryTypesData, selectedTags, allTagNames])
 
-  // Note: Auto-expand removed to prevent infinite render loops
-  // Users can manually expand/collapse nodes as needed
+  // Filter tree collection based on search query
+  const filteredTreeCollection = useMemo(() => {
+    if (!searchQuery) return treeCollection
+    return treeCollection.filter((node) => contains(node.name, searchQuery))
+  }, [treeCollection, searchQuery, contains])
+
+  // Auto-expand all entry type folders (or all filtered results when searching)
+  useEffect(() => {
+    if (searchQuery) {
+      // When searching, expand all branches in filtered results
+      const filtered = treeCollection.filter((node) =>
+        contains(node.name, searchQuery)
+      )
+      const branchValues = filtered.getBranchValues()
+
+      // Only update if the values are different
+      setExpandedNodes((prev) => {
+        const prevSet = new Set(prev)
+        const newSet = new Set(branchValues)
+        if (
+          prevSet.size !== newSet.size ||
+          !branchValues.every((val) => prevSet.has(val))
+        ) {
+          return branchValues
+        }
+        return prev
+      })
+    } else {
+      // When not searching, expand all entry type folders
+      const collectEntryTypeFolderIds = (nodes: TreeNode[]): string[] => {
+        const ids: string[] = []
+        for (const node of nodes) {
+          if (node.isEntryTypeFolder) {
+            ids.push(node.id)
+            if (node.children) {
+              ids.push(...collectEntryTypeFolderIds(node.children))
+            }
+          }
+        }
+        return ids
+      }
+
+      const rootNode = treeCollection.rootNode
+      const entryTypeFolderIds = rootNode.children
+        ? collectEntryTypeFolderIds(rootNode.children)
+        : []
+
+      // Only update if the values are different
+      setExpandedNodes((prev) => {
+        const prevSet = new Set(prev)
+        const newSet = new Set(entryTypeFolderIds)
+        if (
+          prevSet.size !== newSet.size ||
+          !entryTypeFolderIds.every((val) => prevSet.has(val))
+        ) {
+          return entryTypeFolderIds
+        }
+        return prev
+      })
+    }
+  }, [treeCollection, searchQuery])
 
   const dockItems: DockItemData[] = [
     {
@@ -374,9 +650,20 @@ export default function WorldDetail() {
 
   return (
     <>
-      <Container maxW="container.xl" py={8} pb={32}>
+      <style jsx global>{`
+        body {
+          overflow: hidden !important;
+        }
+      `}</style>
+      <Flex
+        direction="column"
+        height="100vh"
+        maxW="container.xl"
+        mx="auto"
+        overflow="hidden"
+      >
         {/* World Header */}
-        <Box mx="auto" maxW="90%">
+        <Box mx="auto" maxW="90%" pt={8} flexShrink={0}>
           <Flex align="start" gap={4} mb={8}>
             {world.icon && (
               <Text fontSize="5xl" lineHeight={1}>
@@ -387,212 +674,58 @@ export default function WorldDetail() {
               <Heading size="2xl" mb={2} color="white">
                 {world.name}
               </Heading>
-              {world.description && (
-                <Text fontSize="lg" color="gray.100">
-                  {world.description}
-                </Text>
-              )}
             </Box>
           </Flex>
         </Box>
 
-        {/* Dashboard View */}
-        {currentView === "dashboard" && (
-          <Box mx="auto" maxW="90%">
-            {entriesLoading ? (
-              <Text color="gray.300">Loading entries...</Text>
-            ) : entries.length === 0 ? (
-              <Box textAlign="center" py={16} borderRadius="3xl">
-                <Text fontSize="4xl" mb={4}>
-                  📝
-                </Text>
-                <Heading size="md" mb={2} color="white">
-                  No entries found
-                </Heading>
-                <Text color="gray.300" mb={6}>
-                  Create your first entry to start building your world
-                </Text>
-              </Box>
-            ) : (
-              <Box minH="600px">
-                <Masonry items={masonryItems} />
-              </Box>
-            )}
-          </Box>
-        )}
+        {/* Content Area - Scrollable */}
+        <Box flex={1} overflow="hidden" pb="100px">
+          {/* Dashboard View */}
+          {currentView === "dashboard" && (
+            <DashboardView
+              isLoading={entriesLoading}
+              entries={entries}
+              weaveId={weaveId}
+              worldId={worldId}
+            />
+          )}
 
-        {/* Tree View */}
-        {currentView === "tree" && (
-          <Box mx="auto" maxW="90%">
-            {allEntriesLoading ? (
-              <Text color="gray.300">Loading entries...</Text>
-            ) : allEntries.length === 0 ? (
-              <Box textAlign="center" py={16}>
-                <Text fontSize="4xl" mb={4}>
-                  📝
-                </Text>
-                <Heading size="md" mb={2} color="white">
-                  No entries found
-                </Heading>
-                <Text color="gray.300" mb={6}>
-                  Create your first entry to start building your world
-                </Text>
-              </Box>
-            ) : (
-              <>
-                {/* Tree View Mode Selector */}
-                <Flex gap={2} mb={4} justify="start">
-                  <Button
-                    size="sm"
-                    variant={treeViewMode === "hierarchy" ? "solid" : "ghost"}
-                    colorPalette={
-                      treeViewMode === "hierarchy" ? "teal" : "gray"
-                    }
-                    onClick={() => setTreeViewMode("hierarchy")}
-                  >
-                    Hierarchy
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={treeViewMode === "entry-type" ? "solid" : "ghost"}
-                    colorPalette={
-                      treeViewMode === "entry-type" ? "teal" : "gray"
-                    }
-                    onClick={() => setTreeViewMode("entry-type")}
-                  >
-                    By Entry Type
-                  </Button>
-                </Flex>
+          {/* Tree View */}
+          {currentView === "tree" && (
+            <WorldTreeView
+              isLoading={allEntriesLoading}
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
+              selectedTags={selectedTags}
+              onSelectedTagsChange={setSelectedTags}
+              tagSearchValue={tagSearchValue}
+              onTagSearchValueChange={setTagSearchValue}
+              filteredTags={filteredTags}
+              tagCollection={tagCollection}
+              filteredTreeCollection={filteredTreeCollection}
+              expandedNodes={expandedNodes}
+              onExpandedNodesChange={setExpandedNodes}
+              weaveId={weaveId}
+              worldId={worldId}
+              onDeleteEntry={handleDeleteEntry}
+              onRenameEntryType={handleRenameEntryType}
+              onCreateNestedEntryType={handleCreateNestedEntryType}
+              onDeleteEntryType={handleDeleteEntryType}
+              numberOfEntries={allEntries.length}
+              numberOfEntryTypes={entryTypes.length}
+            />
+          )}
 
-                <TreeView.Root collection={treeCollection} size="md">
-                  <TreeView.Tree>
-                    <TreeView.Node<TreeNode>
-                      indentGuide={<TreeView.BranchIndentGuide />}
-                      render={({ node, nodeState }) => {
-                        // In entry-type mode, folder nodes are entry types (not clickable entries)
-                        const isEntryTypeFolder =
-                          node.isEntryTypeFolder === true
+          {/* Timeline View */}
+          {currentView === "timeline" && <TimelineView />}
 
-                        return nodeState.isBranch ? (
-                          isEntryTypeFolder ? (
-                            <TreeView.BranchControl
-                              _hover={{ bg: "rgba(20, 184, 166, 0.1)" }}
-                              transition="background 0.2s"
-                              bg="rgba(20, 184, 166, 0.05)"
-                              borderRadius="md"
-                            >
-                              <LuFolder color="rgb(20, 184, 166)" />
-                              <TreeView.BranchText
-                                color="rgb(94, 234, 212)"
-                                fontWeight="medium"
-                              >
-                                {node.name}
-                              </TreeView.BranchText>
-                              <TreeView.BranchIndicator color="rgb(94, 234, 212)" />
-                            </TreeView.BranchControl>
-                          ) : (
-                            <Link
-                              href={`/weaves/${weaveId}/worlds/${worldId}/entries/${node.id}`}
-                              style={{
-                                textDecoration: "none",
-                                display: "block",
-                              }}
-                            >
-                              <TreeView.BranchControl
-                                _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
-                                transition="background 0.2s"
-                              >
-                                {node.icon ? (
-                                  <Text fontSize="md">{node.icon}</Text>
-                                ) : (
-                                  <LuFolder color="white" />
-                                )}
-                                <TreeView.BranchText color="white">
-                                  {node.name}
-                                </TreeView.BranchText>
-                                {node.entryTypeName && (
-                                  <Badge
-                                    size="sm"
-                                    ml={2}
-                                    bg="rgba(255, 255, 255, 0.1)"
-                                    color="gray.300"
-                                  >
-                                    {node.entryTypeName}
-                                  </Badge>
-                                )}
-                                <TreeView.BranchIndicator />
-                              </TreeView.BranchControl>
-                            </Link>
-                          )
-                        ) : (
-                          <Link
-                            href={`/weaves/${weaveId}/worlds/${worldId}/entries/${node.id}`}
-                            style={{ textDecoration: "none", display: "block" }}
-                          >
-                            <TreeView.Item
-                              _hover={{ bg: "rgba(255, 255, 255, 0.05)" }}
-                              transition="background 0.2s"
-                            >
-                              {node.icon ? (
-                                <Text fontSize="md">{node.icon}</Text>
-                              ) : (
-                                <LuFileIcon color="white" />
-                              )}
-                              <TreeView.ItemText color="white">
-                                {node.name}
-                              </TreeView.ItemText>
-                              {node.entryTypeName && (
-                                <Badge
-                                  size="sm"
-                                  ml={2}
-                                  bg="rgba(255, 255, 255, 0.1)"
-                                  color="gray.300"
-                                >
-                                  {node.entryTypeName}
-                                </Badge>
-                              )}
-                            </TreeView.Item>
-                          </Link>
-                        )
-                      }}
-                    />
-                  </TreeView.Tree>
-                </TreeView.Root>
-              </>
-            )}
-          </Box>
-        )}
+          {/* Search View */}
+          {currentView === "search" && <SearchView />}
 
-        {/* Timeline View */}
-        {currentView === "timeline" && (
-          <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">
-              Timeline
-            </Heading>
-            <Text color="gray.300">Coming soon...</Text>
-          </Box>
-        )}
-
-        {/* Search View */}
-        {currentView === "search" && (
-          <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">
-              Search
-            </Heading>
-            <Text color="gray.300">Coming soon...</Text>
-          </Box>
-        )}
-
-        {/* Knowledge Graph View */}
-        {currentView === "knowledge-graph" && (
-          <Box mx="auto" maxW="90%" textAlign="center" py={16}>
-            <Heading size="lg" mb={4} color="white">
-              Knowledge Graph
-            </Heading>
-            <Text color="gray.300">Coming soon...</Text>
-          </Box>
-        )}
-      </Container>
+          {/* Knowledge Graph View */}
+          {currentView === "knowledge-graph" && <KnowledgeGraphView />}
+        </Box>
+      </Flex>
 
       {/* Fixed Dock at bottom */}
       <Box
@@ -604,6 +737,49 @@ export default function WorldDetail() {
       >
         <Dock items={dockItems} />
       </Box>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteEntryDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        entryName={entryToDelete?.name || null}
+        onConfirm={confirmDelete}
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Rename Entry Type Dialog */}
+      <RenameEntryTypeDialog
+        open={renameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
+        entryTypeName={entryTypeToRename?.name || null}
+        newName={newEntryTypeName}
+        onNewNameChange={setNewEntryTypeName}
+        onConfirm={confirmRename}
+        isLoading={renameMutation.isPending}
+      />
+
+      {/* Create Nested Entry Type Dialog */}
+      <CreateNestedEntryTypeDialog
+        open={createNestedDialogOpen}
+        onOpenChange={setCreateNestedDialogOpen}
+        parentEntryTypeName={parentEntryType?.name || null}
+        newName={nestedEntryTypeName}
+        onNewNameChange={setNestedEntryTypeName}
+        onConfirm={confirmCreateNested}
+        isLoading={createNestedMutation.isPending}
+      />
+
+      {/* Delete Entry Type Dialog */}
+      <DeleteEntryTypeDialog
+        open={deleteEntryTypeDialogOpen}
+        onOpenChange={setDeleteEntryTypeDialogOpen}
+        entryTypeName={entryTypeToDelete?.name || null}
+        onConfirm={confirmDeleteEntryType}
+        isLoading={deleteEntryTypeMutation.isPending}
+        hasEntries={
+          entryTypeToDelete ? entryTypeHasEntries(entryTypeToDelete.id) : false
+        }
+      />
     </>
   )
 }

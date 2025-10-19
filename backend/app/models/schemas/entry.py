@@ -6,7 +6,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
 # --- Entry Schemas ---
 
 
@@ -37,6 +36,9 @@ class EntryCreate(EntryBase):
     timeline_is_circa: bool = False
     timeline_is_ongoing: bool = False
     timeline_display_override: str | None = None
+
+    # Tags (tag names, will be created if they don't exist)
+    tags: list[str] = []
 
 
 class EntryUpdate(BaseModel):
@@ -97,6 +99,7 @@ class EntryPublic(EntryBase):
     parent_id: UUID | None = None
     children_count: int | None = None
     character_count: int | None = None
+    tags: list[str] = []  # List of tag names
 
 
 class EntryWithFields(EntryPublic):

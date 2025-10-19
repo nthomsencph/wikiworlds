@@ -3,10 +3,9 @@
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.models.entry import EntryType, FieldDefinition
-
 
 # --- EntryType CRUD ---
 
@@ -73,7 +72,7 @@ def get_entry_type_by_slug(
         select(EntryType)
         .where(EntryType.world_id == world_id)
         .where(EntryType.slug == slug)
-        .where(EntryType.deleted_at.is_(None))
+        .where(col(EntryType.deleted_at).is_(None))
     )
     return session.exec(statement).first()
 
@@ -99,7 +98,7 @@ def get_world_entry_types(
     statement = (
         select(EntryType)
         .where(EntryType.world_id == world_id)
-        .where(EntryType.deleted_at.is_(None))
+        .where(col(EntryType.deleted_at).is_(None))
         .offset(skip)
         .limit(limit)
     )
@@ -122,7 +121,17 @@ def update_entry_type(
     Returns:
         Updated EntryType object
     """
+    import re
     from datetime import datetime
+
+    # If name is being updated, auto-generate a new slug
+    if "name" in entry_type_update:
+        new_name = entry_type_update["name"]
+        # Generate slug from name: lowercase, replace spaces/special chars with hyphens
+        new_slug = re.sub(r"[^\w\s-]", "", new_name.lower())
+        new_slug = re.sub(r"[\s_-]+", "-", new_slug)
+        new_slug = new_slug.strip("-")
+        entry_type_update["slug"] = new_slug
 
     for key, value in entry_type_update.items():
         setattr(entry_type, key, value)
@@ -172,7 +181,7 @@ def create_field_definition(
     statement = (
         select(FieldDefinition)
         .where(FieldDefinition.entry_type_id == entry_type_id)
-        .order_by(FieldDefinition.position.desc())
+        .order_by(col(FieldDefinition.position).desc())
     )
     last_field = session.exec(statement).first()
     next_position = (last_field.position + 1) if last_field else 0
@@ -225,7 +234,7 @@ def get_entry_type_fields(
     statement = (
         select(FieldDefinition)
         .where(FieldDefinition.entry_type_id == entry_type_id)
-        .order_by(FieldDefinition.position)
+        .order_by(col(FieldDefinition.position).desc())
     )
     return list(session.exec(statement).all())
 

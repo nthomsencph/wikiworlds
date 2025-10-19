@@ -3,12 +3,11 @@
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import Session, select, text
+from sqlmodel import Session, col, select, text
 
 from app.models.entry import Entry, FieldValue
 from app.utils.ltree import build_path, is_descendant_of
 from app.utils.temporal import temporal_filter
-
 
 # --- Entry CRUD ---
 
@@ -76,7 +75,7 @@ def get_entry(*, session: Session, entry_id: UUID) -> Entry | None:
         Entry object or None if not found
     """
     statement = (
-        select(Entry).where(Entry.id == entry_id).where(Entry.deleted_at.is_(None))
+        select(Entry).where(Entry.id == entry_id).where(col(Entry.deleted_at).is_(None))
     )
     return session.exec(statement).first()
 
@@ -101,7 +100,7 @@ def get_entry_by_slug(
         select(Entry)
         .where(Entry.world_id == world_id)
         .where(Entry.slug == slug)
-        .where(Entry.deleted_at.is_(None))
+        .where(col(Entry.deleted_at).is_(None))
     )
     return session.exec(statement).first()
 
@@ -131,7 +130,7 @@ def get_world_entries(
     statement = (
         select(Entry)
         .where(Entry.world_id == world_id)
-        .where(Entry.deleted_at.is_(None))
+        .where(col(Entry.deleted_at).is_(None))
     )
 
     if entry_type_id:
@@ -140,7 +139,9 @@ def get_world_entries(
     if timeline_year is not None:
         statement = statement.where(
             temporal_filter(
-                Entry.timeline_start_year, Entry.timeline_end_year, year=timeline_year
+                col(Entry.timeline_start_year),  # type: ignore
+                col(Entry.timeline_end_year),  # type: ignore
+                year=timeline_year,
             )
         )
 
@@ -168,8 +169,8 @@ def get_root_entries(
     statement = (
         select(Entry)
         .where(Entry.world_id == world_id)
-        .where(Entry.deleted_at.is_(None))
-        .where(~Entry.path.contains("."))  # No dots = root level
+        .where(col(Entry.deleted_at).is_(None))
+        .where(~col(Entry.path).contains("."))  # No dots = root level
     )
 
     if entry_type_id:
@@ -203,7 +204,7 @@ def get_children(
         statement = (
             select(Entry)
             .where(Entry.world_id == parent.world_id)
-            .where(Entry.deleted_at.is_(None))
+            .where(col(Entry.deleted_at).is_(None))
             .where(text(f"path <@ '{parent.path}'"))  # ltree descendant operator
             .where(Entry.id != parent_id)  # Exclude the parent itself
         )
@@ -212,7 +213,7 @@ def get_children(
         statement = (
             select(Entry)
             .where(Entry.world_id == parent.world_id)
-            .where(Entry.deleted_at.is_(None))
+            .where(col(Entry.deleted_at).is_(None))
             .where(
                 text(f"path ~ '{parent.path}.*{{1}}'")
             )  # ltree pattern for direct children
@@ -243,7 +244,7 @@ def get_ancestors(
     statement = (
         select(Entry)
         .where(Entry.world_id == entry.world_id)
-        .where(Entry.deleted_at.is_(None))
+        .where(col(Entry.deleted_at).is_(None))
         .where(
             text(f"'{entry.path}' <@ path")
         )  # Entry path is descendant of ancestor paths
@@ -401,8 +402,8 @@ def set_field_value(
             select(FieldValue)
             .where(FieldValue.entry_id == entry_id)
             .where(FieldValue.field_definition_id == field_definition_id)
-            .where(FieldValue.timeline_start_year.is_(None))
-            .where(FieldValue.timeline_end_year.is_(None))
+            .where(col(FieldValue.timeline_start_year).is_(None))
+            .where(col(FieldValue.timeline_end_year).is_(None))
         )
         existing = session.exec(statement).first()
 
@@ -457,8 +458,8 @@ def get_field_values(
     if timeline_year is not None:
         statement = statement.where(
             temporal_filter(
-                FieldValue.timeline_start_year,
-                FieldValue.timeline_end_year,
+                col(FieldValue.timeline_start_year),  # type: ignore
+                col(FieldValue.timeline_end_year),  # type: ignore
                 year=timeline_year,
             )
         )
@@ -486,7 +487,7 @@ def get_field_value_history(
         select(FieldValue)
         .where(FieldValue.entry_id == entry_id)
         .where(FieldValue.field_definition_id == field_definition_id)
-        .order_by(FieldValue.timeline_start_year)
+        .order_by(col(FieldValue.timeline_start_year))
     )
     return list(session.exec(statement).all())
 

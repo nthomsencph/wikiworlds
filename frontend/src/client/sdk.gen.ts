@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { BlocksCreateBlockData, BlocksCreateBlockResponse, BlocksListBlocksData, BlocksListBlocksResponse, BlocksBulkCreateBlocksData, BlocksBulkCreateBlocksResponse, BlocksGetBlockData, BlocksGetBlockResponse, BlocksUpdateBlockData, BlocksUpdateBlockResponse, BlocksDeleteBlockData, BlocksDeleteBlockResponse, EntriesCreateEntryData, EntriesCreateEntryResponse, EntriesListEntriesData, EntriesListEntriesResponse, EntriesListRootEntriesData, EntriesListRootEntriesResponse, EntriesGetEntryData, EntriesGetEntryResponse, EntriesUpdateEntryData, EntriesUpdateEntryResponse, EntriesDeleteEntryData, EntriesDeleteEntryResponse, EntriesMoveEntryData, EntriesMoveEntryResponse, EntriesGetChildrenData, EntriesGetChildrenResponse, EntriesGetAncestorsData, EntriesGetAncestorsResponse, EntriesGetFieldValuesData, EntriesGetFieldValuesResponse, EntriesSetFieldValueData, EntriesSetFieldValueResponse, EntriesSetFieldValuesBulkData, EntriesSetFieldValuesBulkResponse, EntriesGetFieldValueHistoryData, EntriesGetFieldValueHistoryResponse, EntriesDeleteFieldValueData, EntriesDeleteFieldValueResponse, EntryTypesCreateEntryTypeData, EntryTypesCreateEntryTypeResponse, EntryTypesListEntryTypesData, EntryTypesListEntryTypesResponse, EntryTypesGetEntryTypeData, EntryTypesGetEntryTypeResponse, EntryTypesUpdateEntryTypeData, EntryTypesUpdateEntryTypeResponse, EntryTypesDeleteEntryTypeData, EntryTypesDeleteEntryTypeResponse, EntryTypesListFieldsData, EntryTypesListFieldsResponse, EntryTypesCreateFieldData, EntryTypesCreateFieldResponse, EntryTypesUpdateFieldData, EntryTypesUpdateFieldResponse, EntryTypesDeleteFieldData, EntryTypesDeleteFieldResponse, EntryTypesReorderFieldsData, EntryTypesReorderFieldsResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, WeavesCreateWeaveData, WeavesCreateWeaveResponse, WeavesListMyWeavesData, WeavesListMyWeavesResponse, WeavesGetWeaveData, WeavesGetWeaveResponse, WeavesUpdateWeaveData, WeavesUpdateWeaveResponse, WeavesDeleteWeaveData, WeavesDeleteWeaveResponse, WeavesListWeaveMembersData, WeavesListWeaveMembersResponse, WeavesAddWeaveMemberData, WeavesAddWeaveMemberResponse, WeavesUpdateMemberRoleData, WeavesUpdateMemberRoleResponse, WeavesRemoveWeaveMemberData, WeavesRemoveWeaveMemberResponse, WorldsCreateWorldData, WorldsCreateWorldResponse, WorldsListWeaveWorldsData, WorldsListWeaveWorldsResponse, WorldsListPublicWorldsData, WorldsListPublicWorldsResponse, WorldsGetWorldData, WorldsGetWorldResponse, WorldsUpdateWorldData, WorldsUpdateWorldResponse, WorldsDeleteWorldData, WorldsDeleteWorldResponse, WorldsListWorldMembersData, WorldsListWorldMembersResponse, WorldsAddWorldMemberData, WorldsAddWorldMemberResponse, WorldsUpdateMemberRoleData, WorldsUpdateMemberRoleResponse, WorldsRemoveWorldMemberData, WorldsRemoveWorldMemberResponse } from './types.gen';
+import type { BlocksCreateBlockData, BlocksCreateBlockResponse, BlocksListBlocksData, BlocksListBlocksResponse, BlocksBulkCreateBlocksData, BlocksBulkCreateBlocksResponse, BlocksGetBlockData, BlocksGetBlockResponse, BlocksUpdateBlockData, BlocksUpdateBlockResponse, BlocksDeleteBlockData, BlocksDeleteBlockResponse, EntriesCreateEntryData, EntriesCreateEntryResponse, EntriesListEntriesData, EntriesListEntriesResponse, EntriesListRootEntriesData, EntriesListRootEntriesResponse, EntriesGetEntryData, EntriesGetEntryResponse, EntriesUpdateEntryData, EntriesUpdateEntryResponse, EntriesDeleteEntryData, EntriesDeleteEntryResponse, EntriesMoveEntryData, EntriesMoveEntryResponse, EntriesGetChildrenData, EntriesGetChildrenResponse, EntriesGetAncestorsData, EntriesGetAncestorsResponse, EntriesGetFieldValuesData, EntriesGetFieldValuesResponse, EntriesSetFieldValueData, EntriesSetFieldValueResponse, EntriesSetFieldValuesBulkData, EntriesSetFieldValuesBulkResponse, EntriesGetFieldValueHistoryData, EntriesGetFieldValueHistoryResponse, EntriesDeleteFieldValueData, EntriesDeleteFieldValueResponse, EntryTypesCreateEntryTypeData, EntryTypesCreateEntryTypeResponse, EntryTypesListEntryTypesData, EntryTypesListEntryTypesResponse, EntryTypesGetEntryTypeData, EntryTypesGetEntryTypeResponse, EntryTypesUpdateEntryTypeData, EntryTypesUpdateEntryTypeResponse, EntryTypesDeleteEntryTypeData, EntryTypesDeleteEntryTypeResponse, EntryTypesListFieldsData, EntryTypesListFieldsResponse, EntryTypesCreateFieldData, EntryTypesCreateFieldResponse, EntryTypesUpdateFieldData, EntryTypesUpdateFieldResponse, EntryTypesDeleteFieldData, EntryTypesDeleteFieldResponse, EntryTypesReorderFieldsData, EntryTypesReorderFieldsResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, TagsCreateTagData, TagsCreateTagResponse, TagsListTagsData, TagsListTagsResponse, TagsGetTagData, TagsGetTagResponse, TagsUpdateTagData, TagsUpdateTagResponse, TagsDeleteTagData, TagsDeleteTagResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, WeavesCreateWeaveData, WeavesCreateWeaveResponse, WeavesListMyWeavesData, WeavesListMyWeavesResponse, WeavesGetWeaveData, WeavesGetWeaveResponse, WeavesUpdateWeaveData, WeavesUpdateWeaveResponse, WeavesDeleteWeaveData, WeavesDeleteWeaveResponse, WeavesListWeaveMembersData, WeavesListWeaveMembersResponse, WeavesAddWeaveMemberData, WeavesAddWeaveMemberResponse, WeavesUpdateMemberRoleData, WeavesUpdateMemberRoleResponse, WeavesRemoveWeaveMemberData, WeavesRemoveWeaveMemberResponse, WorldsCreateWorldData, WorldsCreateWorldResponse, WorldsListWeaveWorldsData, WorldsListWeaveWorldsResponse, WorldsListPublicWorldsData, WorldsListPublicWorldsResponse, WorldsGetWorldData, WorldsGetWorldResponse, WorldsUpdateWorldData, WorldsUpdateWorldResponse, WorldsDeleteWorldData, WorldsDeleteWorldResponse, WorldsListWorldMembersData, WorldsListWorldMembersResponse, WorldsAddWorldMemberData, WorldsAddWorldMemberResponse, WorldsUpdateMemberRoleData, WorldsUpdateMemberRoleResponse, WorldsRemoveWorldMemberData, WorldsRemoveWorldMemberResponse } from './types.gen';
 
 export class Blocks {
     /**
@@ -35,7 +35,7 @@ export class Blocks {
             }
         });
     }
-
+    
     /**
      * List Blocks
      * Get all blocks for an entry.
@@ -68,7 +68,7 @@ export class Blocks {
             }
         });
     }
-
+    
     /**
      * Bulk Create Blocks
      * Create multiple blocks at once for an entry.
@@ -98,7 +98,7 @@ export class Blocks {
             }
         });
     }
-
+    
     /**
      * Get Block
      * Get a specific block by ID.
@@ -123,7 +123,7 @@ export class Blocks {
             }
         });
     }
-
+    
     /**
      * Update Block
      * Update a block.
@@ -151,7 +151,7 @@ export class Blocks {
             }
         });
     }
-
+    
     /**
      * Delete Block
      * Delete a block.
@@ -204,7 +204,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * List Entries
      * Get all Entries in a World with optional filtering.
@@ -243,7 +243,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * List Root Entries
      * Get all root entries (no parent) in a World.
@@ -270,7 +270,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Get Entry
      * Get a specific Entry by ID with its field values.
@@ -299,7 +299,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Update Entry
      * Update an Entry.
@@ -327,7 +327,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Delete Entry
      * Delete an Entry (soft delete).
@@ -358,7 +358,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Move Entry
      * Move an entry to a new parent or to root.
@@ -386,7 +386,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Get Children
      * Get child entries of a parent.
@@ -415,7 +415,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Get Ancestors
      * Get ancestor entries (breadcrumb trail from root to parent).
@@ -440,7 +440,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Get Field Values
      * Get all field values for an entry.
@@ -469,7 +469,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Set Field Value
      * Set a field value for an entry.
@@ -500,7 +500,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Set Field Values Bulk
      * Set multiple field values at once.
@@ -528,7 +528,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Get Field Value History
      * Get all historical values for a specific field (temporal history).
@@ -555,7 +555,7 @@ export class Entries {
             }
         });
     }
-
+    
     /**
      * Delete Field Value
      * Delete a specific field value (useful for temporal field values).
@@ -610,7 +610,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * List Entry Types
      * Get all EntryTypes in a World.
@@ -639,7 +639,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Get Entry Type
      * Get a specific EntryType by ID.
@@ -664,7 +664,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Update Entry Type
      * Update an EntryType.
@@ -692,7 +692,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Delete Entry Type
      * Delete an EntryType (soft delete).
@@ -719,7 +719,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * List Fields
      * Get all field definitions for an EntryType.
@@ -744,7 +744,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Create Field
      * Create a new field definition for an EntryType.
@@ -772,7 +772,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Update Field
      * Update a field definition.
@@ -802,7 +802,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Delete Field
      * Delete a field definition.
@@ -831,7 +831,7 @@ export class EntryTypes {
             }
         });
     }
-
+    
     /**
      * Reorder Fields
      * Reorder field definitions.
@@ -884,7 +884,7 @@ export class Items {
             }
         });
     }
-
+    
     /**
      * Create Item
      * Create new item.
@@ -904,7 +904,7 @@ export class Items {
             }
         });
     }
-
+    
     /**
      * Read Item
      * Get item by ID.
@@ -925,7 +925,7 @@ export class Items {
             }
         });
     }
-
+    
     /**
      * Update Item
      * Update an item.
@@ -949,7 +949,7 @@ export class Items {
             }
         });
     }
-
+    
     /**
      * Delete Item
      * Delete an item.
@@ -992,7 +992,7 @@ export class Login {
             }
         });
     }
-
+    
     /**
      * Test Token
      * Test access token
@@ -1005,7 +1005,7 @@ export class Login {
             url: '/api/v1/login/test-token'
         });
     }
-
+    
     /**
      * Recover Password
      * Password Recovery
@@ -1026,7 +1026,7 @@ export class Login {
             }
         });
     }
-
+    
     /**
      * Reset Password
      * Reset password
@@ -1046,7 +1046,7 @@ export class Login {
             }
         });
     }
-
+    
     /**
      * Recover Password Html Content
      * HTML Content for Password Recovery
@@ -1091,6 +1091,143 @@ export class Private {
     }
 }
 
+export class Tags {
+    /**
+     * Create Tag
+     * Create a new Tag in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns TagPublic Successful Response
+     * @throws ApiError
+     */
+    public static createTag(data: TagsCreateTagData): CancelablePromise<TagsCreateTagResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/tags/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * List Tags
+     * Get all Tags in a World.
+     * @param data The data for the request.
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.skip
+     * @param data.limit
+     * @returns TagsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listTags(data: TagsListTagsData): CancelablePromise<TagsListTagsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/tags/',
+            path: {
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Tag
+     * Get a specific Tag by ID.
+     * @param data The data for the request.
+     * @param data.tagId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns TagPublic Successful Response
+     * @throws ApiError
+     */
+    public static getTag(data: TagsGetTagData): CancelablePromise<TagsGetTagResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/tags/{tag_id}',
+            path: {
+                tag_id: data.tagId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Tag
+     * Update a Tag.
+     * @param data The data for the request.
+     * @param data.tagId
+     * @param data.worldId
+     * @param data.weaveId
+     * @param data.requestBody
+     * @returns TagPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateTag(data: TagsUpdateTagData): CancelablePromise<TagsUpdateTagResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/tags/{tag_id}',
+            path: {
+                tag_id: data.tagId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Tag
+     * Delete a Tag (soft delete).
+     *
+     * This will also remove this tag from all entries.
+     * @param data The data for the request.
+     * @param data.tagId
+     * @param data.worldId
+     * @param data.weaveId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteTag(data: TagsDeleteTagData): CancelablePromise<TagsDeleteTagResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/weaves/{weave_id}/worlds/{world_id}/tags/{tag_id}',
+            path: {
+                tag_id: data.tagId,
+                world_id: data.worldId,
+                weave_id: data.weaveId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
 export class Users {
     /**
      * Read Users
@@ -1114,7 +1251,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Create User
      * Create new user.
@@ -1134,7 +1271,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Read User Me
      * Get current user.
@@ -1147,7 +1284,7 @@ export class Users {
             url: '/api/v1/users/me'
         });
     }
-
+    
     /**
      * Delete User Me
      * Delete own user.
@@ -1160,7 +1297,7 @@ export class Users {
             url: '/api/v1/users/me'
         });
     }
-
+    
     /**
      * Update User Me
      * Update own user.
@@ -1180,7 +1317,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Update Password Me
      * Update own password.
@@ -1200,7 +1337,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Register User
      * Create new user without the need to be logged in.
@@ -1220,7 +1357,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Read User By Id
      * Get a specific user by id.
@@ -1241,7 +1378,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Update User
      * Update a user.
@@ -1265,7 +1402,7 @@ export class Users {
             }
         });
     }
-
+    
     /**
      * Delete User
      * Delete a user.
@@ -1309,7 +1446,7 @@ export class Utils {
             }
         });
     }
-
+    
     /**
      * Health Check
      * @returns boolean Successful Response
@@ -1345,7 +1482,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * List My Weaves
      * Get all Weaves the current user has access to.
@@ -1368,7 +1505,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Get Weave
      * Get a specific Weave by ID.
@@ -1389,7 +1526,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Update Weave
      * Update a Weave.
@@ -1415,7 +1552,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Delete Weave
      * Delete a Weave (soft delete).
@@ -1439,7 +1576,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * List Weave Members
      * Get all members of a Weave.
@@ -1460,7 +1597,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Add Weave Member
      * Add a new member to a Weave.
@@ -1486,7 +1623,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Update Member Role
      * Update a member's role in a Weave.
@@ -1514,7 +1651,7 @@ export class Weaves {
             }
         });
     }
-
+    
     /**
      * Remove Weave Member
      * Remove a member from a Weave.
@@ -1568,7 +1705,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * List Weave Worlds
      * Get all Worlds in a Weave that the current user has access to.
@@ -1595,7 +1732,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * List Public Worlds
      * Get all public Worlds (no authentication required).
@@ -1618,7 +1755,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Get World
      * Get a specific World by ID.
@@ -1641,7 +1778,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Update World
      * Update a World.
@@ -1669,7 +1806,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Delete World
      * Delete a World (soft delete).
@@ -1695,7 +1832,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * List World Members
      * Get all members of a World.
@@ -1718,7 +1855,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Add World Member
      * Add a new member to a World.
@@ -1746,7 +1883,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Update Member Role
      * Update a member's role in a World.
@@ -1776,7 +1913,7 @@ export class Worlds {
             }
         });
     }
-
+    
     /**
      * Remove World Member
      * Remove a member from a World.

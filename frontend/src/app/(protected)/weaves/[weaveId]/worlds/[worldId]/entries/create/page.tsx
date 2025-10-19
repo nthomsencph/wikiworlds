@@ -175,6 +175,7 @@ export default function CreateEntryPage() {
       entry_type_id: selectedEntryType.id,
       parent_id: null,
       cover_image: coverImage || null,
+      tags,
     })
   }
 

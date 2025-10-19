@@ -7,7 +7,7 @@
 #
 # Note: All names are plural (e.g., "Places", "Regions") except "General"
 
-DEFAULT_ENTRY_TYPES = [
+DEFAULT_ENTRY_TYPES: list[dict[str, str | None]] = [
     # =============================================================================
     # TOP-LEVEL: GENERAL
     # =============================================================================

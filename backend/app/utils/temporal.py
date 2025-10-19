@@ -3,17 +3,19 @@
 Provides helper functions for temporal queries and filtering.
 """
 
-from sqlalchemy import and_, or_
+from typing import Any
+
+from sqlalchemy import and_, or_, true
 from sqlalchemy.sql.elements import ColumnElement
 
 
 def temporal_filter(
-    start_year_col: ColumnElement,
-    end_year_col: ColumnElement,
+    start_year_col: ColumnElement[Any],
+    end_year_col: ColumnElement[Any],
     year: int | None = None,
     year_min: int | None = None,
     year_max: int | None = None,
-) -> ColumnElement:
+) -> ColumnElement[bool]:
     """Create a SQL filter for temporal validity.
 
     This handles the logic for checking if an entity exists during a given year
@@ -64,18 +66,18 @@ def temporal_filter(
             # Entity must start before or during year_max
             conditions.append(or_(start_year_col.is_(None), start_year_col <= year_max))
 
-        return and_(*conditions) if conditions else True
+        return and_(*conditions) if conditions else true()
 
     # No temporal filter
-    return True
+    return true()
 
 
 def overlaps_period(
-    start_year_col: ColumnElement,
-    end_year_col: ColumnElement,
+    start_year_col: ColumnElement[Any],
+    end_year_col: ColumnElement[Any],
     period_start: int | None,
     period_end: int | None,
-) -> ColumnElement:
+) -> ColumnElement[bool]:
     """Check if an entity's temporal period overlaps with a given period.
 
     Args:
@@ -89,7 +91,7 @@ def overlaps_period(
     """
     # If either has unknown start/end, consider it as overlapping
     if period_start is None and period_end is None:
-        return True
+        return true()
 
     conditions = []
 
@@ -101,10 +103,10 @@ def overlaps_period(
     if period_start is not None:
         conditions.append(or_(end_year_col.is_(None), end_year_col >= period_start))
 
-    return and_(*conditions) if conditions else True
+    return and_(*conditions) if conditions else true()
 
 
-def is_ongoing(end_year_col: ColumnElement) -> ColumnElement:
+def is_ongoing(end_year_col: ColumnElement[Any]) -> ColumnElement[bool]:
     """Filter for entities that are currently ongoing (no end year).
 
     Args:
@@ -116,7 +118,7 @@ def is_ongoing(end_year_col: ColumnElement) -> ColumnElement:
     return end_year_col.is_(None)
 
 
-def has_ended(end_year_col: ColumnElement) -> ColumnElement:
+def has_ended(end_year_col: ColumnElement[Any]) -> ColumnElement[bool]:
     """Filter for entities that have ended (have an end year).
 
     Args:
@@ -128,7 +130,7 @@ def has_ended(end_year_col: ColumnElement) -> ColumnElement:
     return end_year_col.isnot(None)
 
 
-def is_ancient(start_year_col: ColumnElement) -> ColumnElement:
+def is_ancient(start_year_col: ColumnElement[Any]) -> ColumnElement[bool]:
     """Filter for entities with unknown/ancient beginning (no start year).
 
     Args:
