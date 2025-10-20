@@ -79,15 +79,14 @@ export const WorldTreeView = ({
               placeholder={`Search ${numberOfEntries} entries in ${numberOfEntryTypes} entry types...`}
               size="md"
               flex="2"
-              bg="rgba(255, 255, 255, 0.05)"
-              border="1px solid rgba(255, 255, 255, 0.1)"
+              //bg="rgba(255, 255, 255, 0.05)"
+              border="1px solid rgba(255, 255, 255, 0.59)"
               borderRadius="lg"
               color="white"
               _placeholder={{ color: "rgba(255, 255, 255, 0.3)" }}
               _focus={{
                 outline: "none",
-                borderColor: "rgba(20, 184, 166, 0.5)",
-                boxShadow: "0 0 0 1px rgba(20, 184, 166, 0.5)",
+                borderColor: "rgba(255, 255, 255, 0.59)",
               }}
             />
 
@@ -109,14 +108,13 @@ export const WorldTreeView = ({
                     gap={1.5}
                     px={2}
                     py={0}
-                    bg="rgba(255, 255, 255, 0.05)"
-                    border="1px solid rgba(255, 255, 255, 0.1)"
+                    //bg="rgba(255, 255, 255, 0.05)"
+                    border="1px solid rgba(255, 255, 255, 0.5)"
                     borderRadius="lg"
                     height="40px"
                     alignItems="center"
                     _focusWithin={{
-                      borderColor: "rgba(20, 184, 166, 0.5)",
-                      boxShadow: "0 0 0 1px rgba(20, 184, 166, 0.5)",
+                      borderColor: "rgba(255, 255, 255, 0.59)",
                     }}
                   >
                     {selectedTags.map((tag) => (
@@ -168,11 +166,10 @@ export const WorldTreeView = ({
                 <Portal>
                   <Combobox.Positioner>
                     <Combobox.Content
-                      bg="rgba(20, 20, 20, 0.95)"
-                      backdropFilter="blur(10px)"
+                      bg="transparent"
+                      //backdropFilter="blur(10px)"
                       borderRadius="xl"
-                      boxShadow="0 4px 12px rgba(0, 0, 0, 0.5)"
-                      border="1px solid rgba(255, 255, 255, 0.1)"
+                      border="1px solid rgba(255, 255, 255, 0.5)"
                     >
                       <Combobox.ItemGroup>
                         {filteredTags.map((tag) => (
@@ -186,7 +183,7 @@ export const WorldTreeView = ({
                             <Combobox.ItemIndicator color="rgb(94, 234, 212)" />
                           </Combobox.Item>
                         ))}
-                        <Combobox.Empty color="gray.400" px={3} py={2}>
+                        <Combobox.Empty color="white" px={3} py={2}>
                           No tags found
                         </Combobox.Empty>
                       </Combobox.ItemGroup>
@@ -220,14 +217,14 @@ export const WorldTreeView = ({
                           _hover={{ "& .entry-type-actions": { opacity: 1 } }}
                         >
                           <TreeView.BranchControl
-                            _hover={{ bg: "rgba(20, 184, 166, 0.1)" }}
+                            _hover={{ bg: "rgba(255, 255, 255, 0.2)" }}
                             transition="background 0.2s"
-                            bg="rgba(20, 184, 166, 0.05)"
+                            bg="transparent"
                             borderRadius="md"
                           >
-                            <LuFolder color="rgb(20, 184, 166)" />
+                            <LuFolder color="rgb(125, 199, 242)" />
                             <TreeView.BranchText
-                              color="rgb(94, 234, 212)"
+                              color="rgb(255, 255, 255)"
                               fontWeight="medium"
                             >
                               <Highlight

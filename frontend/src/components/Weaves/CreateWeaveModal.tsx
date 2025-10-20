@@ -311,11 +311,13 @@ export default function CreateWeaveModal({
             )}
 
             {/* Step Content */}
-            {steps.map((step, index) => (
-              <Steps.Content key={index} index={index}>
-                {step.description}
-              </Steps.Content>
-            ))}
+            <Box minH="200px">
+              {steps.map((step, index) => (
+                <Steps.Content key={index} index={index}>
+                  {step.description}
+                </Steps.Content>
+              ))}
+            </Box>
           </Steps.Root>
         </DialogBody>
 

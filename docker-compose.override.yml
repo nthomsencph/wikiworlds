@@ -24,6 +24,12 @@ services:
       - --entrypoints.http.address=:80
       # Create an entrypoint "https" listening on port 443
       - --entrypoints.https.address=:443
+      # Create a dummy certificate resolver "le" for local development
+      # This prevents errors about missing resolver, but doesn't actually generate certs
+      - --certificatesresolvers.le.acme.email=dev@localhost
+      - --certificatesresolvers.le.acme.storage=/tmp/acme.json
+      # Use a fake CA server that won't actually issue certificates
+      - --certificatesresolvers.le.acme.caserver=https://localhost:9999/directory
       # Enable the access log, with HTTP requests
       - --accesslog
       # Enable the Traefik log, for configurations and errors

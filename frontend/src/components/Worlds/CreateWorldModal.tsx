@@ -1,10 +1,20 @@
 "use client"
 
-import { Box, Flex, Input, Text, Textarea } from "@chakra-ui/react"
+import {
+  Box,
+  Flex,
+  Heading,
+  Input,
+  Text,
+  Textarea,
+  Stack,
+  Steps,
+  Checkbox,
+} from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { FiAlertCircle } from "react-icons/fi"
+import { FiAlertCircle, FiUsers } from "react-icons/fi"
 
 import { Worlds as WorldsAPI, type WorldCreate } from "@/client"
 import { Button } from "@/components/ui/button"
@@ -12,11 +22,8 @@ import { Field } from "@/components/ui/field"
 import {
   DialogRoot,
   DialogContent,
-  DialogHeader,
   DialogBody,
   DialogFooter,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog"
 
 interface CreateWorldModalProps {
@@ -32,10 +39,13 @@ export default function CreateWorldModal({
 }: CreateWorldModalProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
+  // Start at step 0 (Core fields)
+  const [currentStep, setCurrentStep] = useState(0)
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
   const [icon, setIcon] = useState("")
+  const [coverImage, setCoverImage] = useState("")
   const [isPublic, setIsPublic] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,8 +59,10 @@ export default function CreateWorldModal({
       setSlug("")
       setDescription("")
       setIcon("")
+      setCoverImage("")
       setIsPublic(false)
       setError(null)
+      setCurrentStep(0)
       onClose()
       // Navigate to the newly created world
       router.push(`/weaves/${weaveId}/worlds/${newWorld.id}`)
@@ -71,8 +83,34 @@ export default function CreateWorldModal({
     setSlug(autoSlug)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleNext = () => {
+    setError(null)
+
+    // Validation for step 0 (Name and Description)
+    if (currentStep === 0) {
+      if (!name.trim()) {
+        setError("World name is required")
+        return
+      }
+    }
+
+    // Validation for step 1 (Icon and Slug)
+    if (currentStep === 1) {
+      if (!slug.trim()) {
+        setError("Slug is required")
+        return
+      }
+    }
+
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  }
+
+  const handlePrev = () => {
+    setError(null)
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+  }
+
+  const handleSubmit = () => {
     setError(null)
 
     if (!name.trim()) {
@@ -90,10 +128,129 @@ export default function CreateWorldModal({
       slug: slug.trim(),
       description: description.trim() || null,
       icon: icon.trim() || null,
+      cover_image: coverImage.trim() || null,
       is_public: isPublic,
       is_template: false,
     })
   }
+
+  const steps = [
+    {
+      title: "Core",
+      description: (
+        <Stack gap={4}>
+          <Field label="Name" required>
+            <Input
+              placeholder="Middle Earth"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              autoFocus
+              borderRadius="full"
+            />
+          </Field>
+
+          <Field label="Description">
+            <Textarea
+              placeholder="A brief description of your world..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              borderRadius="2xl"
+            />
+          </Field>
+        </Stack>
+      ),
+    },
+    {
+      title: "Misc.",
+      description: (
+        <Stack gap={4}>
+          <Field label="Icon">
+            <Input
+              placeholder="🌍"
+              value={icon}
+              onChange={(e) => setIcon(e.target.value)}
+              maxLength={2}
+              borderRadius="full"
+            />
+          </Field>
+
+          <Field
+            label="Cover Image"
+            helperText="URL to a cover image for this world (optional)"
+          >
+            <Input
+              placeholder="https://example.com/image.jpg"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              borderRadius="full"
+            />
+          </Field>
+
+          <Field
+            label="Slug"
+            helperText="Used in URLs. Auto-generated from name."
+            required
+          >
+            <Input
+              placeholder="middle-earth"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              borderRadius="full"
+            />
+          </Field>
+        </Stack>
+      ),
+    },
+    {
+      title: "Settings",
+      description: (
+        <Stack gap={4}>
+          <Field>
+            <Flex align="center" gap={2}>
+              <Checkbox.Root
+                checked={isPublic}
+                onCheckedChange={({ checked }) => setIsPublic(Boolean(checked))}
+                colorPalette="teal"
+              >
+                <Checkbox.HiddenInput />
+                <Checkbox.Control borderRadius="full" />
+                <Checkbox.Label>
+                  Make this world public{" "}
+                  <Box as="span" color="gray.500">
+                    (Public worlds can be viewed by anyone via the URL)
+                  </Box>
+                </Checkbox.Label>
+              </Checkbox.Root>
+            </Flex>
+          </Field>
+        </Stack>
+      ),
+    },
+    {
+      title: "Invite",
+      description: (
+        <Box p={8} textAlign="center">
+          <Flex justify="center" mb={4}>
+            <Box
+              p={4}
+              bg={{ base: "teal.100", _dark: "teal.800" }}
+              borderRadius="full"
+            >
+              <FiUsers size={32} />
+            </Box>
+          </Flex>
+          <Heading
+            size="md"
+            mb={2}
+            color={{ base: "gray.900", _dark: "gray.100" }}
+          >
+            Collaboration Coming Soon!
+          </Heading>
+        </Box>
+      ),
+    },
+  ]
 
   return (
     <DialogRoot
@@ -104,111 +261,110 @@ export default function CreateWorldModal({
         }
       }}
     >
-      <DialogContent maxW="lg">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Create New World</DialogTitle>
-            <DialogDescription>
-              Create a new world within this weave. A world is a container for
-              entries and has its own timeline and entry types.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogBody>
-            <Flex direction="column" gap={4}>
-              {error && (
-                <Box
-                  p={3}
-                  bg={{ base: "red.50", _dark: "red.900" }}
-                  borderRadius="md"
-                  borderWidth={1}
-                  borderColor={{ base: "red.200", _dark: "red.700" }}
-                >
-                  <Flex align="center" gap={2}>
-                    <FiAlertCircle color="red" />
-                    <Text
-                      fontSize="sm"
-                      color={{ base: "red.700", _dark: "red.200" }}
+      <DialogContent
+        maxW="2xl"
+        bg={{ base: "white", _dark: "black" }}
+        borderWidth={1}
+        borderColor={{ base: "gray.200", _dark: "gray.800" }}
+        borderRadius="2xl"
+      >
+        <DialogBody pt={6}>
+          <Steps.Root
+            step={currentStep}
+            count={steps.length}
+            colorPalette="teal"
+          >
+            {/* Steps Progress Bar */}
+            <Box display="flex" justifyContent="center" mb={8}>
+              <Steps.List w="70%">
+                {steps.map((step, index) => (
+                  <Steps.Item key={index} index={index}>
+                    <Steps.Indicator />
+                    <Steps.Title
+                      color={{ base: "gray.900", _dark: "gray.100" }}
                     >
-                      {error}
-                    </Text>
-                  </Flex>
-                </Box>
-              )}
+                      {step.title}
+                    </Steps.Title>
+                    <Steps.Separator
+                      bg={{ base: "gray.200", _dark: "gray.600" }}
+                      _complete={{ bg: "teal.900" }}
+                    />
+                  </Steps.Item>
+                ))}
+              </Steps.List>
+            </Box>
 
-              <Field label="World Name" required>
-                <Input
-                  placeholder="Middle Earth"
-                  value={name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  autoFocus
-                />
-              </Field>
-
-              <Field
-                label="Slug"
-                helperText="Used in URLs. Auto-generated from name."
-                required
-              >
-                <Input
-                  placeholder="middle-earth"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                />
-              </Field>
-
-              <Field label="Icon" helperText="Single emoji (optional)">
-                <Input
-                  placeholder="🌍"
-                  value={icon}
-                  onChange={(e) => setIcon(e.target.value)}
-                  maxLength={2}
-                />
-              </Field>
-
-              <Field label="Description" helperText="Optional">
-                <Textarea
-                  placeholder="A brief description of your world..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                />
-              </Field>
-
-              <Field
-                label="Visibility"
-                helperText="Public worlds can be viewed by anyone"
+            {/* Error Display */}
+            {error && (
+              <Box
+                mb={4}
+                p={3}
+                bg={{ base: "red.50", _dark: "red.900" }}
+                borderRadius="lg"
               >
                 <Flex align="center" gap={2}>
-                  <input
-                    type="checkbox"
-                    id="is-public"
-                    checked={isPublic}
-                    onChange={(e) => setIsPublic(e.target.checked)}
-                  />
-                  <label htmlFor="is-public">
-                    <Text fontSize="sm">Make this world public</Text>
-                  </label>
+                  <FiAlertCircle color="red" />
+                  <Text
+                    fontSize="sm"
+                    color={{ base: "red.700", _dark: "red.200" }}
+                  >
+                    {error}
+                  </Text>
                 </Flex>
-              </Field>
-            </Flex>
-          </DialogBody>
+              </Box>
+            )}
 
-          <DialogFooter>
-            <Flex gap={2} justify="end" w="full">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                colorPalette="blue"
-                loading={createMutation.isPending}
-              >
-                Create World
-              </Button>
+            {/* Step Content */}
+            <Box minH="200px">
+              {steps.map((step, index) => (
+                <Steps.Content key={index} index={index}>
+                  {step.description}
+                </Steps.Content>
+              ))}
+            </Box>
+          </Steps.Root>
+        </DialogBody>
+
+        <DialogFooter>
+          <Flex gap={2} justify="space-between" w="full">
+            <Box>
+              {currentStep === 0 && (
+                <Button colorPalette="gray" variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+              )}
+            </Box>
+            <Flex gap={2}>
+              {currentStep > 0 && (
+                <Button
+                  colorPalette="gray"
+                  variant="outline"
+                  onClick={handlePrev}
+                  disabled={createMutation.isPending}
+                >
+                  Previous
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button
+                  colorPalette="teal"
+                  onClick={handleNext}
+                  disabled={createMutation.isPending}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  colorPalette="teal"
+                  onClick={handleSubmit}
+                  loading={createMutation.isPending}
+                >
+                  Create {name.trim() || "World"}
+                </Button>
+              )}
             </Flex>
-          </DialogFooter>
-        </form>
+          </Flex>
+        </DialogFooter>
       </DialogContent>
     </DialogRoot>
   )
