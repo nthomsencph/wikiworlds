@@ -20,7 +20,7 @@
     "@tanstack/react-query-devtools": "^5.87.1",
     "@tiptap/extension-character-count": "^3.7.1",
     "@tiptap/extension-collaboration": "^3.7.1",
-    "@tiptap/extension-color": "^3.7.1",
+    "@tiptap/extension-color": "^3.9.1",
     "@tiptap/extension-document": "^3.7.1",
     "@tiptap/extension-heading": "^3.7.1",
     "@tiptap/extension-highlight": "^3.7.1",
